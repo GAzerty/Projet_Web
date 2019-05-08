@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
 
-    <title>PROJET WEB TEMPLATE</title>
+    <title>{% block title %}{% endblock %}</title>
   </head>
   <body>
 
@@ -51,10 +51,14 @@
             </div>
           </li>
         </ul>
-        <form class="form-inline my-2 my-lg-0">
+        <div class="my-2 my-lg-0">
+          <a class="btn btn-outline-success my-2 my-sm-0" href="{% url 'signup' %}">Nouveau Compte</a>
+          <a class="btn btn-outline-primary my-2 my-sm-0" href="#">Connexion</a>
+        </div>
+        <!--<form class="form-inline my-2 my-lg-0">
           <input class="form-control mr-sm-2" type="search" placeholder="Friend-id" aria-label="Search">
           <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-        </form>
+        </form>-->
       </div>
     </nav>
 
