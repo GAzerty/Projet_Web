@@ -1,5 +1,12 @@
-from django.shortcuts import render
-from app.forms import *
+from django.shortcuts import render, redirect
+from django.contrib.auth import login, logout, authenticate
+from app.forms import SignupJoueurForm
+from django.contrib.auth.models import User
+from app.models import Joueur
+
+
+
+
 # ---- VIEWS BASIQUES
 
 def accueil(request):
@@ -20,7 +27,17 @@ def accueil(request):
 #CREATE
 def signupJoueur(request):
     if request.method == "POST":
-        print("gh")
+        form = SignupJoueurForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data('username')
+            raw_password = form.cleaned_data('password1')
+            user = authenticate(username=username,password=raw_password)
+            Utilisateur = User.objects.get(username=username)
+            new_Joueur = Joueur(idJoueur=Utilisateur,idQuartier=form.cleaned_data('choix_quartier'))
+            new_Joueur.save()
+            login(request,user)
+            return redirect('accueil')
     else:
         form = SignupJoueurForm()
         return render(request, "signup_joueur.html", {'SignupJoueurForm': form})
