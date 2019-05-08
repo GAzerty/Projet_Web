@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 import django_heroku
+from .secret_settings import *
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -20,7 +21,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'd5wpq8*$$9lzay)ofwrk5dpgq1mlb_*!6hh+2325-2iv02-j26'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -118,6 +118,12 @@ USE_L10N = True
 
 USE_TZ = True
 
+
+#SESSION
+
+SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies" #Les sessions sont gérés avec les cookies en définissant la variable SESSION_ENGINE ainsi
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True #La session expire à la fermeture du navigateur
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
