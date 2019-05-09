@@ -21,15 +21,17 @@
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#menuResponsive" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
         <span><i class="material-icons">menu</i></span>
       </button>
-      <a class="navbar-brand" href="#"><img src="https://img.icons8.com/ios/50/000000/football.png">FOOT2RUE</a>
+      <a class="navbar-brand" href="{% url 'accueil' %}"><img src="https://img.icons8.com/ios/50/000000/football.png">PROJETWEB</a>
 
       <div class="collapse navbar-collapse" id="menuResponsive">
         <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+          {% if user.is_authenticated %}
           <li class="nav-item">
-            <a class="nav-link" href="#"><i class="material-icons">account_circle</i>Username</a>
+            <a class="nav-link" href="#">@{{ request.user.username }}</a>
           </li>
+
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"><i class="material-icons">people</i>Amis</a>
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Amis</a>
             <div class="dropdown-menu">
               <a class="dropdown-item" href="#">Mes amis</a>
               <a class="dropdown-item" href="#">Invitations en amis</a>
@@ -37,12 +39,13 @@
             </div>
           </li>
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"><i class="material-icons">calendar_today</i>Matchs</a>
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Matchs</a>
             <div class="dropdown-menu">
               <a class="dropdown-item" href="#">Tout mes matchs</a>
               <a class="dropdown-item" href="#">Organiser un match</a>
             </div>
           </li>
+          {% endif %}
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Stades</a>
             <div class="dropdown-menu">
@@ -51,10 +54,16 @@
             </div>
           </li>
         </ul>
+        {% if user.is_authenticated %}
         <div class="my-2 my-lg-0">
-          <a class="btn btn-outline-success my-2 my-sm-0" href="{% url 'signup' %}">Nouveau Compte</a>
-          <a class="btn btn-outline-primary my-2 my-sm-0" href="#">Connexion</a>
+          <a class="btn btn-outline-primary my-2 my-sm-0" href="{% url 'logout' %}">Deconnexion</a>
         </div>
+        {% else %}
+        <div class="my-2 my-lg-0">
+          <a class="btn btn-outline-success my-2 my-sm-0" href="{% url 'signup' %}">S'inscrire</a>
+          <a class="btn btn-outline-primary my-2 my-sm-0" href="{% url 'signin' %}">Connexion</a>
+        </div>
+        {% endif %}
         <!--<form class="form-inline my-2 my-lg-0">
           <input class="form-control mr-sm-2" type="search" placeholder="Friend-id" aria-label="Search">
           <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
@@ -63,6 +72,41 @@
     </nav>
 
     {% block maincontent %}
+    <div class="container">
+
+        <div class="row">
+            <div class="col">
+              {% if not user.is_authenticated %}
+              <div class="card-deck">
+                <div class="card text-center">
+                  <div class="card-header">
+                    Bienvenue sur FootEntreAmis
+                  </div>
+                  <div class="card-body">
+                    <h5 class="card-title">Alors ? Pas encore inscrit !</h5>
+                    <p class="card-text">Inscrit toi dès maintenant et organise des matchs de foot avec tes amis dans les différents stades de la ville.</p>
+                  </div>
+                  <div class="card-footer">
+                    <a class="btn btn-outline-success my-2 my-sm-0" href="{% url 'signup' %}">S'inscrire</a>
+                    <a class="btn btn-outline-primary my-2 my-sm-0" href="{% url 'signin' %}">Connexion</a>
+                  </div>
+                </div>
+                <div class="card text-center">
+                  <div class="card-header">
+                    Je suis de passage
+                  </div>
+                  <div class="card-body">
+                    <h5 class="card-title">Je souhaite consulter les stades à Montpellier</h5>
+                    <p class="card-text">Notre carte répertorie tout les stades de la ville de Montpellier. Même pas besoin de se connecter pour ça !</p>
+                    <a href="#" class="btn btn-primary">Voir la carte des stades</a>
+                  </div>
+                </div>
+
+              </div>
+              {% endif %}
+            </div>
+        </div>
+    </div>
 
 
     {% endblock %}
