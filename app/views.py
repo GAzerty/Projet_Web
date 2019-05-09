@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from app.forms import SignupJoueurForm
 from django.contrib.auth.models import User
-from app.models import Joueur
+from app.models import Joueur, Quartier
 
 
 
@@ -12,9 +12,9 @@ from app.models import Joueur
 def accueil(request):
     return render(request, 'index.html')
 
-#def login()
-
-#def loggout()
+def logoutJoueur(request):
+    logout(request)
+    return render(request, 'index.html')
 
 #change psswd()
 
@@ -30,14 +30,15 @@ def signupJoueur(request):
         form = SignupJoueurForm(request.POST)
         if form.is_valid():
             form.save()
-            username = form.cleaned_data('username')
-            raw_password = form.cleaned_data('password1')
+            username = form.cleaned_data['username']
+            raw_password = form.cleaned_data['password1']
             user = authenticate(username=username,password=raw_password)
             Utilisateur = User.objects.get(username=username)
-            new_Joueur = Joueur(idJoueur=Utilisateur,idQuartier=form.cleaned_data('choix_quartier'))
+            quartier = Quartier.objects.get(nomQuartier=form.cleaned_data['choix_quartier'])
+            new_Joueur = Joueur(idJoueur=Utilisateur,quartierJoueur=quartier)
             new_Joueur.save()
             login(request,user)
-            return redirect('accueil')
+            return render(request, 'index.html')
     else:
         form = SignupJoueurForm()
         return render(request, "signup_joueur.html", {'SignupJoueurForm': form})

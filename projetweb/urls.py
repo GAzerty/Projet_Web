@@ -18,9 +18,13 @@ from django.urls import path
 from app import views
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.accueil, name='accueil'),
     path('signup/', views.signupJoueur, name='signup'),
+    path('signin/', auth_views.LoginView.as_view(template_name='signin_joueur.html',redirect_field_name='accueil'), name='signin'),
+    path('logout/', views.logoutJoueur, name='logout'),
+    #from django.contrib.auth.forms import AuthenticationForm
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
