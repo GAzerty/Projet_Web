@@ -26,5 +26,6 @@ urlpatterns = [
     path('signup/', views.signupJoueur, name='signup'),
     path('signin/', auth_views.LoginView.as_view(template_name='signin_joueur.html',redirect_field_name='accueil'), name='signin'),
     path('logout/', views.logoutJoueur, name='logout'),
-    #from django.contrib.auth.forms import AuthenticationForm
+    path('account/', views.moncompteJoueur, name='account'),
+    path('account/update', views.updateJoueur, name='update_joueur'),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
