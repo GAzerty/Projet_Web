@@ -1,0 +1,23 @@
+
+body {
+  font-family: 'Sarabun', sans-serif;
+  background: linear-gradient(to right, #a9ff8d57, #a3e3fbd4);
+}
+
+nav {
+  background: linear-gradient(to right, #a9ff8d57, #a3e3fbd4);
+}
+
+.custom-formulaire{
+    border-radius : 10px;
+    background-color: white;
+}
+
+.form-error{
+    color:red;
+}
+
+.account-aside{
+    border-radius : 10px;
+    background-color: white;
+}
