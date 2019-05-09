@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'app'
+    'app',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
@@ -135,5 +136,9 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+LOGIN_URL = 'sigin' #Redirection vers la connexion de l'utilisateur
+LOGIN_REDIRECT_URL = 'accueil' #Redirection après la connexion de l'utilisateur
+
 # Activate Django-Heroku.
 django_heroku.settings(locals())
