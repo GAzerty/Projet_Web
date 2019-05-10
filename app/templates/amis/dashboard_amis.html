@@ -1,0 +1,53 @@
+{% extends 'index.html' %}
+
+{% block title %}Mon Compte{% endblock %}
+
+{% block maincontent %}
+
+    <div class="row">
+      <div class="col-sm-4 m-1">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Mes amis</h5>
+            <ul  class="list-group list-group-flush">
+                <li class="list-group-item">Liste des amis ici</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-4 m-1">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Rechercher un ami</h5>
+            <p class="card-text">Tapez le nom d'utilisateur de votre ami et lancez une recherche.</p>
+            <form>
+                <input class="form-control mr-sm-2" type="search" placeholder="Nom d'utilisateur" aria-label="Search">
+                <div class="d-flex justify-content-center m-2">
+                    <button class="btn btn-outline-success my-2 my-sm-0 m-1" type="submit">Rechercher</button>
+                </div>
+            </form>
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">Faire une demande d'ami</h5>
+            <p class="card-text">Tapez le nom d'utilisateur et envoyez votre demande.</p>
+            <form>
+                {% csrf_token %}
+                <input class="form-control mr-sm-2" type="search" placeholder="Nom d'utilisateur" aria-label="Search">
+                <div class="d-flex justify-content-center m-2">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Envoyer</button>
+                </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-4 m-1">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Demandes reçus</h5>
+            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+            <a href="#" class="btn btn-primary">Go somewhere</a>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock %}
