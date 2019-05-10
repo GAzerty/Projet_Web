@@ -16,7 +16,7 @@ class Quartier(models.Model):
 
 #MODEL - Joueur
 class Joueur(models.Model):
-    idJoueur = models.OneToOneField(User,on_delete=models.CASCADE)
+    idJoueur = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
     quartierJoueur = models.ForeignKey('Quartier',on_delete=models.CASCADE) #on_delete models.CASCADE : equivalent à la commande SQL
 
     class Meta:
@@ -47,7 +47,7 @@ class Amis(models.Model):
 
     #Retourne True si etatJoueur1 et etatJoueur2 sont Accepter
     def amitie_valide(self):
-        return (self.etatJoueur1=='Accepter') and (self.etatJoueur2=='Accepter')
+        return (self.etatJoueur1=='AC') and (self.etatJoueur2=='AC')
 
 #MODEL - RENCONTRE
 class Rencontre(models.Model):
