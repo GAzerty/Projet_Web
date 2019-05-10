@@ -1,9 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from app.forms import SignupJoueurForm, UpdateJoueurForm
 from django.contrib.auth.models import User
-from app.models import Joueur, Quartier
-
+from app.models import Joueur, Quartier, Amis
+from django.http import JsonResponse
 
 
 
@@ -90,7 +90,7 @@ def updateJoueur(request):
 #DELETE
 def deleteJoueur(request):
     getJoueurConnecte(request).delete()
-    utilisateur = User.objects.get(username=request.user.username).delete
+    utilisateur = User.objects.get(username=request.user.username).delete()
     return render(request, "index.html")
 
 
@@ -101,7 +101,33 @@ def deleteJoueur(request):
 
 # ---- VIEWS AMIS
 
+
+def dashboardAmis(request):
+    return render(request, "amis/dashboard_amis.html")
+
 #CREATE
+#Creation de Amis, prend en paramètre le username de l'amis à qui l'on envoie la demande
+#Réalisé via AJAX
+def demandeAmis(request):
+    usernameAmis = request.POST.get('usernameAmis') #Récupération de l'username
+
+    utilisateur_recipient = get_object_or_404(User, username=usernameAmis)#NB: Un unsername est unique pour chaque User
+    joueur_sender = getJoueurConnecte(request)#C'est le joueur qui réalise la demande en Amis
+    joueur_recipient = get_object_or_404(Joueur, idJoueur=utilisateur_recipient)
+
+    #Testons si une amitiées existe déjà entre ces deux joueurs:
+    intergrity_amis = Amis.objects.get(joueur1Amis=joueur_sender,joueur2Amis=joueur_recipient)
+    if not intergrity_amis: #Si aucune relation n'a été trouvée
+        demande_amis = Amis(joueur1Amis=joueur_sender,joueur2Amis=joueur_recipient)#etatJoueur1 et etatJoueur2 possède des valeurs par défaut, donc nous n'avons pas besoin de les mentionner ici
+        demande_amis.save()
+        feedback = "Votre demande à été envoyée avec succès."
+    else:
+        feedback = "Vous avez déjà envoyé une demande à "+usernameAmis+". Attendez sa réponse !"
+
+    reponse = {
+        "feedback":feedback,
+    }
+    return JsonResponse(reponse)
 
 #READ
 
