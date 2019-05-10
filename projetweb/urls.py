@@ -29,5 +29,5 @@ urlpatterns = [
     path('account/', views.moncompteJoueur, name='account'),
     path('account/update', views.updateJoueur, name='update_joueur'),
     path('friend/dashboard/', views.dashboardAmis, name='dashboard_amis'),
-    path('friend/sendto/<str:usernameAmis>', views.demandeAmis, name='create_amis'),
+    path('friend/sendto/', views.demandeAmis, name='create_amis'),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

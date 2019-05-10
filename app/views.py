@@ -101,21 +101,41 @@ def deleteJoueur(request):
 
 # ---- VIEWS AMIS
 
+#Retourne les amitié réciproque du joueur passé en paramètre
+def mesAmis(joueur):
+    liste_amis = Amis.objects.filter(joueur1Amis=joueur)  # Liste d'Amis du joueur connecté, avec potentiellement
+    amis_valide = []
+    for ami in liste_amis:
+        if ami.amitie_valide(): #On vérifie que la liaison est valide (réciproque)
+            amis_valide.append(ami)
+    return amis_valide
+
+#Retourne les demandes reçus et en attente du joueur en paramètre
+def mesDemandes(joueur):
+    liste_amis = Amis.objects.filter(joueur2Amis=joueur)  # Liste d'Amis du joueur connecté, avec potentiellement
+    demande_amis = []
+    for ami in liste_amis:
+        if not ami.amitie_valide(): #Si le test renvoie False, cela signifie que la demande est encore en attente
+            demande_amis.append(ami)
+    return demande_amis
 
 def dashboardAmis(request):
-    return render(request, "amis/dashboard_amis.html")
+    joueur = getJoueurConnecte(request)
+    listeAmis = mesAmis(joueur)
+    listeDemandes = mesDemandes(joueur)
+    return render(request, "amis/dashboard_amis.html",locals())
 
 #CREATE
 #Creation de Amis, prend en paramètre le username de l'amis à qui l'on envoie la demande
 #Réalisé via AJAX
 def demandeAmis(request):
-    usernameAmis = request.POST.get('usernameAmis') #Récupération de l'username
+    usernameAmis = request.POST.get('demande_usernameAmis') #Récupération de l'username
 
     utilisateur_recipient = get_object_or_404(User, username=usernameAmis)#NB: Un unsername est unique pour chaque User
     joueur_sender = getJoueurConnecte(request)#C'est le joueur qui réalise la demande en Amis
     joueur_recipient = get_object_or_404(Joueur, idJoueur=utilisateur_recipient)
 
-    #Testons si une amitiées existe déjà entre ces deux joueurs:
+    #Testons si une amitié existe déjà entre ces deux joueurs:
     intergrity_amis = Amis.objects.get(joueur1Amis=joueur_sender,joueur2Amis=joueur_recipient)
     if not intergrity_amis: #Si aucune relation n'a été trouvée
         demande_amis = Amis(joueur1Amis=joueur_sender,joueur2Amis=joueur_recipient)#etatJoueur1 et etatJoueur2 possède des valeurs par défaut, donc nous n'avons pas besoin de les mentionner ici
