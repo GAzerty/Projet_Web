@@ -5,6 +5,7 @@
 {% block maincontent %}
 
     <div class="row">
+      {% csrf_token %}
       <div class="col-sm-4 m-1">
         <div class="card">
           <div class="card-body">
@@ -21,7 +22,7 @@
             <h5 class="card-title">Rechercher un ami</h5>
             <p class="card-text">Tapez le nom d'utilisateur de votre ami et lancez une recherche.</p>
             <form>
-                <input class="form-control mr-sm-2" type="search" placeholder="Nom d'utilisateur" aria-label="Search">
+                <input class="form-control mr-sm-2" type="search" placeholder="Nom d'utilisateur" name="rechercheUsername" id="id_rechercheUsername">
                 <div class="d-flex justify-content-center m-2">
                     <button class="btn btn-outline-success my-2 my-sm-0 m-1" type="submit">Rechercher</button>
                 </div>
@@ -31,8 +32,7 @@
             <h5 class="card-title">Faire une demande d'ami</h5>
             <p class="card-text">Tapez le nom d'utilisateur et envoyez votre demande.</p>
             <form>
-                {% csrf_token %}
-                <input class="form-control mr-sm-2" type="search" placeholder="Nom d'utilisateur" aria-label="Search">
+                <input class="form-control mr-sm-2" type="search" placeholder="Nom d'utilisateur" name="demande_usernameAmis" id="id_demande_usernameAmis">
                 <div class="d-flex justify-content-center m-2">
                     <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Envoyer</button>
                 </div>
