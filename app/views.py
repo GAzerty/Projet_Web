@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.db.models import Q
-from app.forms import SignupJoueurForm, UpdateJoueurForm
+from app.forms import SignupJoueurForm, UpdateJoueurForm, CreationRencontreForm, StadeForm
 from django.contrib.auth.models import User
-from app.models import Joueur, Quartier, Amis
+from app.models import Joueur, Quartier, Amis, Rencontre, Stade
 from django.http import JsonResponse
-
+from django.core.paginator import Paginator
 
 
 # ---- VIEWS BASIQUES
@@ -257,12 +257,69 @@ def supprimerAmis(request):
 # ---- VIEWS RENCONTRE
 
 #CREATE
+def createRencontre(request):
+    title="Organiser un match"
+    buttonText="Créer la rencontre"
+    if request.method == "POST":
+        form = CreationRencontreForm(request.POST)
+        print(request.POST)
+        if form.is_valid():
+            new_rencontre = form.save(commit=False) #Création d'une rencontre, commit=False empêche la sauvegarde du nouvel objet
+            stade = get_object_or_404(Stade, nomStade=form.cleaned_data['choix_stade'])
+            new_rencontre.lieuRencontre = stade
+            new_rencontre.save()
+            return render(request, "accueil.html")
+        else:
+            return render(request, "rencontre/formRencontre.html", {"RencontreForm":form,"title":title,"buttonText":buttonText})
+    else:
+        form = CreationRencontreForm()
+        return render(request, "rencontre/formRencontre.html", {"RencontreForm":form,"title":title,"buttonText":buttonText})
+
+
 
 #READ
+def readRencontre(request,idRencontre):
+    rencontre = get_object_or_404(Rencontre, idRencontre=idRencontre)
+    return render(request, "rencontre/readRencontre.html",{"Rencontre":rencontre,})
+
+#LIST
+#Retourne la liste des rencontre du joueur
+#def listRencontre(request)
+
 
 #UPDATE
+def updateRencontre(request,idRencontre):
+    title="Modifier un match"
+    buttonText="Modifier la rencontre"
+    rencontre = get_object_or_404(Rencontre, idRencontre=idRencontre)
+    if request.method == "POST":
+        form = CreationRencontreForm(request.POST)
+        if form.is_valid():
+            stade = get_object_or_404(Stade, nomStade=form.cleaned_data['choix_stade'])
+            rencontre.lieuRencontre = stade
+            rencontre.dateRencontre = form.cleaned_data['dateRencontre']
+            rencontre.heureRencontre = form.cleaned_data['heureRencontre']
+            rencontre.save()
+            return render(request, "accueil.html")
+        else:
+            return render(request, "rencontre/formRencontre.html", {"RencontreForm":form,"title":title,"buttonText":buttonText})
+    else:
+        dataform = {
+            "choix_stade":rencontre.lieuRencontre,
+            "dateRencontre":rencontre.dateRencontre,
+            "heureRencontre":rencontre.heureRencontre,
+        }
+        form = CreationRencontreForm(dataform)
+        return render(request, "rencontre/formRencontre.html", {"RencontreForm":form,"title":title,"buttonText":buttonText})
 
 #DELETE
+def deleteRencontre(request,idRencontre):
+    rencontre = get_object_or_404(Rencontre, idRencontre=idRencontre)
+    if request.method == "DELETE":
+        rencontre.delete()
+        #return render(request, "rencontre/liste_rencontre.html") #Retourne la liste des rencontres du joueur connecté
+
+    return render(request, "delete.html", {"ObjetDelete":rencontre})
 
 
 # ---- VIEWS PARTICIPER
@@ -277,7 +334,15 @@ def supprimerAmis(request):
 
 
 
+# ---- VIEWS INVITER
 
+#CREATE
+
+#READ
+
+#UPDATE
+
+#DELETE
 
 
 
@@ -290,13 +355,70 @@ def supprimerAmis(request):
 # ---- VIEWS STADE
 
 #CREATE
+def createStade(request):
+    if request.method == "POST":
+        form = StadeForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return render(request, "stade/list_stade.html")
+        return render(request, "stade/create_stade.html", {"CreationRencontreForm": form})
+
+    else:
+        form = StadeForm()
+        return render(request, "stade/create_stade.html", {"CreationRencontreForm":form})
+
 
 #READ
+def readStade(request,idStade):
+    stade = get_object_or_404(Stade, idStade=idStade)
+    return render(request, "stade/read_stade.html", {"Stade":stade})
+
+
+#LIST
+def listStade(request):
+    stades_list = Stade.objects.all()
+    paginator = Paginator(stades_list, 6) #Affiche 6 stades par page
+    page = request.GET.get('page')
+    stades = paginator.get_page(page)
+    return render(request, 'stade/list_stade.html', {'stades': stades})
 
 #UPDATE
+def updateStade(request,idStade):
+    stade = get_object_or_404(Stade, idStade=idStade)
+    if request.method == "POST":
+        form = StadeForm(request.POST, request.FILES)
+        if form.is_valid():
+            stade.nomStade = form.cleaned_data['nomStade']
+            stade.rueStade = form.cleaned_data['rueStade']
+            stade.villeStade = form.cleaned_data['villeStade']
+            stade.codepostalStade = form.cleaned_data['codepostalStade']
+            stade.quartierStade = form.cleaned_data['quartierStade']
+            stade.nombreTerrain = form.cleaned_data['nombreTerrain']
+            stade.imageStade = form.cleaned_data['imageStade']
+            stade.save()
+            return readStade(request,stade.idStade)
+        return render(request, "stade/create_stade.html", {"CreationRencontreForm": form})
+
+    else:
+        formdata = {
+            "nomStade":stade.nomStade,
+            "rueStade": stade.rueStade,
+            "villeStade": stade.villeStade,
+            "codepostalStade": stade.codepostalStade,
+            "quartierStade": stade.quartierStade,
+            "nombreTerrain": stade.nombreTerrain,
+        }
+        form = StadeForm(formdata)
+        return render(request, "stade/create_stade.html", {"CreationRencontreForm":form})
+
 
 #DELETE
-
+def deleteStade(request,idStade):
+    stade = get_object_or_404(Stade, idStade=idStade)
+    if request.method == "DELETE":
+        stade.delete()
+        return listStade(request)
+    return render(request, "delete.html", {"ObjetDelete":stade})
 
 
 
