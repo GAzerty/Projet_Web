@@ -23,6 +23,16 @@ function supprimer_amis_traitement(reponse){
     feeback_html.innerHTML = reponse.feedback;
 }
 
+function inviter_amis_traitement(reponse){
+    var feeback_html = document.getElementById("feedback");
+    feeback_html.innerHTML = reponse.feedback;
+}
+
+function accepter_invit_traitement(reponse){
+    var feeback_html = document.getElementById("feedback");
+    feeback_html.innerHTML = reponse.feedback;
+}
+
 function requeteAjax(url,data,fonction_succes){
     var xhttp = new XMLHttpRequest();
     xhttp.open("POST", url, true);
@@ -76,3 +86,36 @@ function supprimer_amis(username){
 document.getElementById("btn_demande_usernameAmis").onclick = demande_amis_click;
 document.getElementById("btn_rechercheUsername").onclick = recherche_amis_click;
 
+
+//-----INVITER
+
+function inviter_amis(username,idrencontre){
+    url = "/rencontre/inviter/";
+    var inputs = document.getElementsByTagName("input");
+    var csrf = "csrfmiddlewaretoken="+inputs.csrfmiddlewaretoken.value;
+    username_send = "username="+username;
+    idrencontre_send = "idRencontre="+idrencontre;
+    data = csrf+"&"+username_send+"&"+idrencontre_send;
+    requeteAjax(url,data,inviter_amis_traitement);
+}
+
+function accepter_invit(idrencontre){
+    url = "/rencontre/invitation/accept";
+    var inputs = document.getElementsByTagName("input");
+    var csrf = "csrfmiddlewaretoken="+inputs.csrfmiddlewaretoken.value;
+    idrencontre_send = "idRencontre="+idrencontre;
+    data = csrf+"&"+idrencontre_send;
+    requeteAjax(url,data,accepter_invit_traitement);
+}
+
+function rejeter_invit(username,idrencontre){
+    url = "/rencontre/invitation/rejeter";
+    var inputs = document.getElementsByTagName("input");
+    var csrf = "csrfmiddlewaretoken="+inputs.csrfmiddlewaretoken.value;
+    username_send = "username="+username;
+    idrencontre_send = "idRencontre="+idrencontre;
+    data = csrf+"&"+username_send+"&"+idrencontre_send;
+    requeteAjax(url,data,accepter_invit_traitement);
+}
+
+//accepter_invit et rejeter_invit ont certainement les mêmes fonctions de traitement - A FAIRE
