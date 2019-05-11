@@ -11,8 +11,8 @@
           <div class="card-body">
             <h5 class="card-title">Mes amis</h5>
             <ul  class="list-group list-group-flush">
-                {% for ami in listeAmis %}
-                <li class="list-group-item">{{ ami.joueur1Amis.idJoueur.username }}
+                {% for joueur in listeAmis %}
+                <li class="list-group-item">{{ joueur.idJoueur.username }}
                 <button class="btn btn-outline-danger my-2 my-sm-0" onclick="supprimer_amis('{{ ami.joueur1Amis.idJoueur.username }}')"><i class="material-icons">clear</i></button>
                 </li>
                 {% endfor %}
