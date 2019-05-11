@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator,MaxValueValidator
 
 
 #MODEL - QUARTIER
@@ -56,7 +56,7 @@ class Rencontre(models.Model):
     scoreVisiteurs = models.IntegerField(blank=True,default=0)
     lieuRencontre = models.ForeignKey('Stade',on_delete=models.CASCADE)
     dateRencontre = models.DateField()
-    heureRencontre = models.TimeField()
+    heureRencontre = models.IntegerField(validators=[MinValueValidator(0),MaxValueValidator(2359)])
     class Meta:
         db_table = "rencontre"
 
