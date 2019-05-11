@@ -49,6 +49,12 @@ class Amis(models.Model):
     def amitie_valide(self):
         return (self.etatJoueur1=='AC') and (self.etatJoueur2=='AC')
 
+    #Retourne le joueur ami avec le joueur passé en paramètre
+    def monAmi(self,Joueurconnecte):
+        if self.joueur1Amis == Joueurconnecte:
+            return self.joueur2Amis
+        return self.joueur1Amis
+
 #MODEL - RENCONTRE
 class Rencontre(models.Model):
     idRencontre = models.AutoField(primary_key=True)
