@@ -3,10 +3,10 @@ from django.contrib.auth import login, logout, authenticate
 from django.db.models import Q
 from app.forms import SignupJoueurForm, UpdateJoueurForm, CreationRencontreForm, StadeForm
 from django.contrib.auth.models import User
-from app.models import Joueur, Quartier, Amis, Rencontre, Stade
+from app.models import Joueur, Quartier, Amis, Rencontre, Stade, Inviter, Participer
 from django.http import JsonResponse
 from django.core.paginator import Paginator
-
+import random
 
 # ---- VIEWS BASIQUES
 
@@ -97,20 +97,15 @@ def deleteJoueur(request):
 
 
 
-
-
-
 # ---- VIEWS AMIS
 
 #Retourne les amitié réciproque du joueur passé en paramètre
 def mesAmis(joueur):
     liste_amis = Amis.objects.filter(Q(joueur1Amis=joueur) | Q(joueur2Amis=joueur))  # Liste d'Amis du joueur
     amis_valide = []
-    print(liste_amis)
     for ami in liste_amis:
         if ami.amitie_valide(): #On vérifie que la liaison est valide (réciproque)
             amis_valide.append(ami)
-    print(amis_valide)
     return amis_valide
 
 #Retourne les demandes reçus et en attente du joueur en paramètre
@@ -126,8 +121,11 @@ def mesDemandes(joueur):
 def dashboardAmis(request):
     joueur = getJoueurConnecte(request)
     listeAmis = mesAmis(joueur)
+    listeJoueurAmis=[]
+    for ami in listeAmis:
+        listeJoueurAmis.append(ami.monAmi(joueur))
     listeDemandes = mesDemandes(joueur)
-    return render(request, "amis/dashboard_amis.html",locals())
+    return render(request, "amis/dashboard_amis.html",{"listeDemandes":listeDemandes,"listeAmis":listeJoueurAmis})
 
 #View qui recherche un ami, à partir d'un username
 #Réalisé via AJAX
@@ -138,7 +136,7 @@ def rechercheAmis(request):
         existe = False
         feedback = "Aucun joueur ne correspond à ce nom"
     else:
-        #joueur = Joueur.objects.get(idJoueur=utilisateur)
+        #joueur = Joueur.objects.get(idJoueur=utilisateur[0])
         existe = True
         feedback = "Joueur trouvé !"
 
@@ -268,7 +266,11 @@ def createRencontre(request):
             stade = get_object_or_404(Stade, nomStade=form.cleaned_data['choix_stade'])
             new_rencontre.lieuRencontre = stade
             new_rencontre.save()
-            return render(request, "accueil.html")
+            joueur = getJoueurConnecte(request)
+            choix_equipe = random.choice(['LOC', 'VIS', ])  # L'équipe du joueur est décidée aléatoirement
+            new_participer = Participer(idJoueur=joueur,idRencontre=new_rencontre,equipe=choix_equipe) #Le joueur qui a créé la rencontre participe automatiquement à la rencontre
+            new_participer.save()
+            return inviterAmis(request,new_rencontre.idRencontre)
         else:
             return render(request, "rencontre/formRencontre.html", {"RencontreForm":form,"title":title,"buttonText":buttonText})
     else:
@@ -280,11 +282,22 @@ def createRencontre(request):
 #READ
 def readRencontre(request,idRencontre):
     rencontre = get_object_or_404(Rencontre, idRencontre=idRencontre)
-    return render(request, "rencontre/readRencontre.html",{"Rencontre":rencontre,})
+    participantsLocaux = Participer.objects.filter(idRencontre=rencontre,equipe="LOC")
+    participantsVisiteurs = Participer.objects.filter(idRencontre=rencontre, equipe="VIS")
+    listInvite = Inviter.objects.filter(idRencontre=rencontre)
+    return render(request, "rencontre/readRencontre.html",{"Rencontre":rencontre,"JoueursLocaux":participantsLocaux,"JoueursVisiteurs":participantsVisiteurs,"JoueursInvite":listInvite,})
 
 #LIST
-#Retourne la liste des rencontre du joueur
-#def listRencontre(request)
+#Retourne la liste des rencontre auquel le joueur participer
+def listRencontre(request):
+    joueur = getJoueurConnecte(request)
+    listParticiper = Participer.objects.filter(idJoueur=joueur)
+    print(listParticiper)
+    listRencontreJoueur = []
+    for participation in listParticiper:
+        listRencontreJoueur.append(participation.idRencontre)
+    print(listRencontreJoueur)
+    return render(request, "rencontre/liste_rencontre.html", {"ListRencontre":listRencontreJoueur,})
 
 
 #UPDATE
@@ -315,11 +328,186 @@ def updateRencontre(request,idRencontre):
 #DELETE
 def deleteRencontre(request,idRencontre):
     rencontre = get_object_or_404(Rencontre, idRencontre=idRencontre)
-    if request.method == "DELETE":
+    if request.method == "POST":
         rencontre.delete()
         #return render(request, "rencontre/liste_rencontre.html") #Retourne la liste des rencontres du joueur connecté
-
+        return accueil(request)
     return render(request, "delete.html", {"ObjetDelete":rencontre})
+
+
+
+
+
+# ---- VIEWS INVITER
+
+#Retourne une page permettant d'inviter les mais du joueur connecté à la rencontre passé en paramètre
+def inviterAmis(request,idRencontre):
+    #Init des valeurs de retour
+    succes=True
+    feedback=""
+    joueur = getJoueurConnecte(request)
+    listAmis = mesAmis(joueur) #Récupère les amis du joueur connecté
+    listJoueurAmis =[]
+
+    for ami in listAmis:
+        listJoueurAmis.append(ami.monAmi(joueur)) #Je récupère les joueur ami avec le joueur passé en paramètre
+
+    rencontre = get_object_or_404(Rencontre, idRencontre=idRencontre)
+    participation = Participer.objects.filter(idJoueur=joueur, idRencontre=rencontre)
+    if not participation:
+        succes=False
+        feedback="Vous ne participez pas à cette rencontre. Vous n'avez pas la possibilité d'ajouter vos amis."
+    return render(request , "inviter/amis_inviter.html", {"listJoueurAmis":listJoueurAmis,"Rencontre":rencontre,"succes":succes,"feedback":feedback})
+
+
+#CREATE
+def createInviter(request):
+    username= request.POST.get('username') #Récupération de l'username
+    idRencontre = request.POST.get('idRencontre')  # Récupération de l'username
+
+    utilisateur_recipient =  User.objects.filter(username=username)#NB: Un unsername est unique pour chaque User
+    rencontre = Rencontre.objects.filter(idRencontre=idRencontre)
+    if not utilisateur_recipient:
+        succes=False
+        feedback = "Aucun joueur ne correspond à ce nom."
+    elif not rencontre:
+        succes=False
+        feedback = "Aucune rencontre correspondant à cet id n'existe."
+    else:
+        joueur_sender = getJoueurConnecte(request)#C'est le joueur qui réalise la demande en Amis
+        joueur_recipient = Joueur.objects.get(idJoueur=utilisateur_recipient[0])
+
+        #Vérifions s'il existe déjà  une invitation de ce joueur pour cette rencontre
+        integrity_inviter = Inviter.objects.filter(idJoueur=joueur_recipient,idRencontre=rencontre[0])
+
+        #Vérifions s'il existe déjà une participation de ce joueur pour cette rencontre.
+        participation = Participer.objects.filter(idJoueur=joueur_recipient,idRencontre=rencontre[0])
+
+        if joueur_recipient.idJoueur==joueur_sender.idJoueur: #Un joueur ne peut pas s'ajouter en ami lui-même
+            succes=False
+            feedback = "Vous ne pouvez pas vous inviter."
+        elif (not integrity_inviter) and (not participation): #Si aucune relation n'a été trouvée dans inviter ou participer
+            invitation = Inviter(idJoueur=joueur_recipient,idRencontre=rencontre[0],joueurDemandeur=joueur_sender)
+            invitation.save()
+            succes=True
+            feedback = "Votre invitation à été envoyée avec succès."
+        else:
+            succes=False
+            feedback = username+" est déjà invité à cette rencontre."
+
+    reponse = {
+        "succes":succes,
+        "feedback":feedback,
+    }
+    return JsonResponse(reponse)
+
+
+
+#LIST
+#Retourne toutes les invitations de la rencontre dont l'id est donné en paramètre
+def listInvitationsRencontre(request,idRencontre):
+    rencontre = get_object_or_404(Rencontre, idRencontre=idRencontre)
+    invitations = Inviter.objects.filter(idRencontre=rencontre)
+    return invitations
+
+#Retourne les invitations du joueur connecté
+def listInvitationsJoueur(request):
+    Joueur = getJoueurConnecte(request)
+    invitations = Inviter.objects.filter(idJoueur=Joueur)
+    return render(request, "inviter/list_invitationsJoueur.html", {"Invitations":invitations,})
+
+
+#UPDATE
+#Pas de mise à jour pour Inviter. Une invitation ne se modifie pas, il faut la supprimer et en créer une nouvelle.
+
+
+#VALID
+def acceptInviter(request):
+    idRencontre = request.POST.get('idRencontre')  # Récupération de l'username
+
+    rencontre = Rencontre.objects.filter(idRencontre=idRencontre)
+    if not rencontre:
+        succes = False
+        feedback = "Cette rencontre n'existe pas."
+    else:
+        joueur = getJoueurConnecte(request)
+        invitation = Inviter.objects.filter(idJoueur=joueur,idRencontre=rencontre[0])
+
+        if not invitation: #Pas de rencontre trouvée
+            succes="False"
+            feedback = "Aucune invitation correspondant à cette rencontre n'a été trouvée."
+        else: #Rencontre trouvée
+            choix_equipe = random.choice(['LOC', 'VIS',]) #L'équipe du joueur est décidée aléatoirement
+            new_participer = Participer(idJoueur=joueur, idRencontre=rencontre[0],equipe=choix_equipe)
+            new_participer.save()
+            invitation[0].delete()  # On peut supprimer l'invitation désormais
+            succes=True
+            feedback = "Invitation acceptée !"
+
+    reponse = {
+        'succes' : succes,
+        'feedback' : feedback,
+    }
+    return JsonResponse(reponse)
+
+
+#Rejeter une invitation reçue
+#Récupère le username du joueurDemandeur et l'id de la rencontre
+#Fait ensuite appel à deleteInviter() en lui précisant le code de suppression
+def rejeterInvitation(request):
+    username_joueurDemandeur = request.POST.get('username')  # Récupération de l'username du joueur demandeur
+    idRencontre = request.POST.get('idRencontre')  # Récupération de l'idRencontre
+    codeSuppression = 0 #La suppression provient de la fonction rejeterInvitation
+    return deleteInviter(request,username_joueurDemandeur,idRencontre,codeSuppression)
+
+
+#Annuler une invitation envoyé
+#Récupère le username du joueur invité (idJoueur) et l'id de la rencontre
+#Fait ensuite appel à deleteInviter() en lui précisant le code de suppression
+def annulerInvitation(request):
+    username_joueurInvite = request.POST.get('username')  # Récupération de l'username du joueur invité
+    idRencontre = request.POST.get('idRencontre')  # Récupération de l'idRencontre
+    codeSuppression = 1 #La suppression provient de la fonction annulerInvitation
+    return deleteInviter(request, username_joueurInvite, idRencontre, codeSuppression)
+
+#DELETE
+def deleteInviter(request,username,idRencontre,codeSuppression):
+    utilisateur_autre = User.objects.filter(username=username)  # NB: Un unsername est unique pour chaque User
+    rencontre = Rencontre.objects.filter(idRencontre=idRencontre)
+
+    if not utilisateur_autre:
+        succes = False
+        feedback = "Aucun joueur ne correspond à ce nom."
+    elif not rencontre:
+        succes = False
+        feedback = "Aucune rencontre correspondant à cet id n'existe."
+    else:
+
+        joueur = getJoueurConnecte(request)
+        joueurAutre = Joueur.objects.get(idJoueur=utilisateur_autre[0])
+
+        #Deux personnes peuvent supprimer l'inviation : le joueur qui a reçu l'invitation et celui qui a envoyé l'invitation
+        #Donc soit le joueur connecté est idJoueur, soit il est joueurDemandeur.
+
+        if codeSuppression==0: #Si la demande de suppression provient de rejeterInvitation, alors idJoueur=getJoueurConnecte
+            invitation = Inviter.objects.filter(Q(idJoueur=joueur,idRencontre=idRencontre,joueurDemandeur=joueurAutre))
+        else:   #Si la demande de suppression provient de annulerInvitation, alors idJoueur=joueurAutre
+            invitation = Inviter.objects.filter(idJoueur=joueurAutre, idRencontre=idRencontre, joueurDemandeur=joueur)
+
+        if not invitation:
+            succes = False
+            feedback = "Aucune invitation correspondante existante."
+        else:
+            invitation[0].delete()
+            succes = True
+            feedback = "Invitation supprimé."
+
+    reponse = {
+        'succes' : succes,
+        'feedback' : feedback,
+    }
+    return JsonResponse(reponse)
+
 
 
 # ---- VIEWS PARTICIPER
@@ -334,15 +522,6 @@ def deleteRencontre(request,idRencontre):
 
 
 
-# ---- VIEWS INVITER
-
-#CREATE
-
-#READ
-
-#UPDATE
-
-#DELETE
 
 
 
