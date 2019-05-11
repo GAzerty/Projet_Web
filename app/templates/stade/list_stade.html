@@ -1,0 +1,29 @@
+{% extends 'index.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Liste des stades{% endblock %}
+
+{% block maincontent %}
+    <div class="d-flex justify-content-center">
+
+        {% for stade in stades %}
+            {{ stade }}
+        {% endfor %}
+
+        <nav class="nav_pagination">
+          <ul class="pagination">
+              {% if stades.has_previous %}
+                <li class="page-item"><a class="page-link" href="{% url 'list_stades' stades.previous_page_number %}">Previous</a></li>
+              {% endif %}
+                <li class="page-item"><a class="page-link" href="#">{{ stades.number }}</a></li>
+              {% if stades.has_next %}
+                <li class="page-item"><a class="page-link" href="{% url 'list_stades' stades.next_page_number %}">Next</a></li>
+              {% endif %}
+          </ul>
+        </nav>
+
+
+    </div>
+{% endblock %}
+
+
