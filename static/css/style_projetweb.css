@@ -25,3 +25,7 @@ nav {
 #feedback{
     color:blue;
 }
+
+.nav_pagination{
+    background:none;
+}
