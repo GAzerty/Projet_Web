@@ -137,6 +137,9 @@ STATICFILES_DIRS = (
 )
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+
 LOGIN_URL = 'sigin' #Redirection vers la connexion de l'utilisateur
 LOGIN_REDIRECT_URL = 'accueil' #Redirection après la connexion de l'utilisateur
 
