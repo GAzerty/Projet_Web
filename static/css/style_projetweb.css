@@ -22,7 +22,7 @@ nav {
     background-color: white;
 }
 
-#feedback{
+#feedback, #feedback_demande_ami, #feedback_recherche_ami{
     color:blue;
 }
 

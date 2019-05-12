@@ -3,13 +3,13 @@ var data;
 var reponse;
 
 function demande_amis_traitement(reponse){
-    var feeback_html = document.getElementById("feedback");
+    var feeback_html = document.getElementById("feedback_demande_ami");
     feeback_html.innerHTML = reponse.feedback;
 }
 
 //Résoudre le problème de value avec input
 function recherche_amis_traitement(reponse){
-    var feeback_html = document.getElementById("feedback");
+    var feeback_html = document.getElementById("feedback_recherche_ami");
     feeback_html.innerHTML = reponse.feedback;
 }
 
@@ -63,7 +63,7 @@ function recherche_amis_click(){
     var csrf = "csrfmiddlewaretoken="+inputs.csrfmiddlewaretoken.value;
     var username = document.getElementById('id_rechercheUsername').name+"="+document.getElementById('id_rechercheUsername').value
     data = csrf+"&"+username;
-    requeteAjax(url,data,demande_amis_traitement);
+    requeteAjax(url,data,recherche_amis_traitement);
 }
 
 
