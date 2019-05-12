@@ -642,11 +642,18 @@ def deleteStade(request,idStade):
 
 
 # ---- VIEWS QUARTIER
-
 #CREATE
-
 #READ
-
 #UPDATE
-
 #DELETE
+
+#LES QUARTIERS SONT GÉRÉS PAR L'ADMINISTRATEUR.
+#IL FAUT DONC UTILISER L'INTERFACE D'ADMINISTRATION DE DJANGO POUR REALISER CES ACTIONS (CRUD)
+
+
+#LIST
+#Retourne tous les quartiers
+def listQuartier(request):
+    quartier = Quartier.objects.all() #Récupère tous les quartiers
+    return render(request, "quartier/listQuartier.html",{"Quartier":quartier})
+
