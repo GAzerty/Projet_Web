@@ -49,4 +49,5 @@ urlpatterns = [
     path('stade/update/<int:idStade>', views.updateStade, name='update_stade'),
     path('stade/delete/<int:idStade>', views.deleteStade, name='delete_stade'),
     path('stade/list/', views.listStade, name='list_stade'),
-]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    path('stade/list/<int:page>', views.listStade, name='list_stade'),
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
