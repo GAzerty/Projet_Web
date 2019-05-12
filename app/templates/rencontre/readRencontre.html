@@ -4,32 +4,42 @@
 
 {% block maincontent %}
     <div class="d-flex justify-content-center flex-wrap">
-        <a href="{% url 'update_rencontre' Rencontre.idRencontre %}" class="btn">Modifier la rencontre</a>
-        <a href="{% url 'delete_rencontre' Rencontre.idRencontre %}" class="btn">Supprimer la rencontre</a>
+        <a href="{% url 'update_rencontre' Rencontre.idRencontre %}" class="btn btn-outline-primary">Modifier la rencontre</a>
+        <a href="{% url 'delete_rencontre' Rencontre.idRencontre %}" class="btn btn-outline-danger">Supprimer la rencontre</a>
     </div>
-    <div class="d-flex justify-content-center">
-        <div class="card text-center">
+    <div>
+        <div class="card text-center shadow">
           <div class="card-header">
               <div>Locaux <span class="badge badge-primary badge-pill"> {{ Rencontre.scoreLocaux }} - {{ Rencontre.scoreVisiteurs }} </span> Visiteurs</div>
               <div>Le {{ Rencontre.dateRencontre }} : {{ Rencontre.heureRencontre }}</div>
-              <div>Stade {{ Rencontre.lieuRencontre.nomStade }}</div>
+              <div><a href="{% url 'read_stade' Rencontre.lieuRencontre.idStade %}">{{ Rencontre.lieuRencontre.nomStade }}</a></div>
           </div>
           <div class="card-body">
             <h5 class="card-title">Équipe locaux</h5>
-            <ul class="list-group-flush">
+            <ul class="list-group">
                 {% for participation in JoueursLocaux %}
-                <li class="list-group-item text-right-left">
-                    {{ participation.idJoueur.idJoueur.username }}
+                <li class="list-group-item text-left">
+                    {% if request.user == participation.idJoueur.idJoueur %}
+                    <a href="{% url 'read_participer' participation.idRencontre.idRencontre %}">{{ participation.idJoueur.idJoueur.username  }}</a>
+                    {% else %}
+                        {{ participation.idJoueur.idJoueur.username  }}
+                    {% endif %}
+                    <span class="badge badge-success badge-pill ">{{ participation.nombreButs  }}</span>
                 </li>
                 {% endfor %}
             </ul>
           </div>
           <div class="card-body">
             <h5 class="card-title ">Équipe visiteurs</h5>
-            <ul class="list-group-flush">
+            <ul class="list-group">
                 {% for participation in JoueursVisiteurs %}
                 <li class="list-group-item text-right">
-                    {{ participation.idJoueur.idJoueur.username  }}
+                    <span class="badge badge-success badge-pill ">{{ participation.nombreButs  }}</span>
+                    {% if request.user == participation.idJoueur.idJoueur %}
+                    <a href="{% url 'read_participer' participation.idRencontre.idRencontre %}">{{ participation.idJoueur.idJoueur.username  }}</a>
+                    {% else %}
+                        {{ participation.idJoueur.idJoueur.username  }}
+                    {% endif %}
                 </li>
                 {% endfor %}
             </ul>
