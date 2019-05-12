@@ -8,7 +8,7 @@
         <div class="custom-formulaire shadow">
           <form class="m-2" method="post" enctype='multipart/form-data' action="">
           {% csrf_token %}
-              {% for field in CreationRencontreForm %}
+              {% for field in StadeForm %}
                   {% for error in field.errors %}
                   <div class="form-error">
                     <p>{{ error }}</p>
