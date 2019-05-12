@@ -1,12 +1,12 @@
 {% extends 'index.html' %}
 
-{% block title %}Mon Compte{% endblock %}
+{% block title %}Mes Amis{% endblock %}
 
 {% block maincontent %}
 
     <div class="row">
       {% csrf_token %}
-      <div class="col-sm-4 m-1">
+      <div class="col-sm-3 m-1">
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">Mes amis</h5>
@@ -25,6 +25,7 @@
           <div class="card-body">
             <h5 class="card-title">Rechercher un ami</h5>
             <p class="card-text">Tapez le nom d'utilisateur de votre ami et lancez une recherche.</p>
+            <div id="feedback_recherche_ami"></div>
             <form>
                 <input class="form-control mr-sm-2" type="search" placeholder="Nom d'utilisateur" name="recherche_usernameAmis" id="id_rechercheUsername">
                 <div class="d-flex justify-content-center m-2">
@@ -35,7 +36,7 @@
           <div class="card-body">
             <h5 class="card-title">Faire une demande d'ami</h5>
             <p class="card-text">Tapez le nom d'utilisateur et envoyez votre demande.</p>
-            <div id="feedback"></div>
+            <div id="feedback_demande_ami"></div>
             <form>
                 <input class="form-control mr-sm-2" type="search" placeholder="Nom d'utilisateur" name="demande_usernameAmis" id="id_demande_usernameAmis">
                 <div class="d-flex justify-content-center m-2">
@@ -45,7 +46,7 @@
           </div>
         </div>
       </div>
-      <div class="col-sm-4 m-1">
+      <div class="col-sm-3 m-1">
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">Demandes reçues</h5>
