@@ -3,14 +3,14 @@
 {% block title %}Résumé de la rencontre{% endblock %}
 
 {% block maincontent %}
-        <div class="d-flex justify-content-center flex-wrap">
-            <a href="{% url 'update_rencontre' Rencontre.idRencontre %}" class="btn">Modifier la rencontre</a>
-            <a href="{% url 'delete_rencontre' Rencontre.idRencontre %}" class="btn">Supprimer la rencontre</a>
-        </div>
+    <div class="d-flex justify-content-center flex-wrap">
+        <a href="{% url 'update_rencontre' Rencontre.idRencontre %}" class="btn">Modifier la rencontre</a>
+        <a href="{% url 'delete_rencontre' Rencontre.idRencontre %}" class="btn">Supprimer la rencontre</a>
+    </div>
     <div class="d-flex justify-content-center">
         <div class="card text-center">
           <div class="card-header">
-              <div>Locaux {{ Rencontre.scoreLocaux }}-{{ Rencontre.scoreVisiteurs }} Visiteurs</div>
+              <div>Locaux <span class="badge badge-primary badge-pill"> {{ Rencontre.scoreLocaux }} - {{ Rencontre.scoreVisiteurs }} </span> Visiteurs</div>
               <div>Le {{ Rencontre.dateRencontre }} : {{ Rencontre.heureRencontre }}</div>
               <div>Stade {{ Rencontre.lieuRencontre.nomStade }}</div>
           </div>
@@ -24,7 +24,7 @@
                 {% endfor %}
             </ul>
           </div>
-            <div class="card-body">
+          <div class="card-body">
             <h5 class="card-title ">Équipe visiteurs</h5>
             <ul class="list-group-flush">
                 {% for participation in JoueursVisiteurs %}
@@ -35,7 +35,7 @@
             </ul>
           </div>
           <div class="card-footer text-muted">
-            <span>Joueur invité </span>
+            <span>Joueurs invités </span>
             <ul class="list-group-flush">
                 {% for invite in JoueursInvite %}
                 <li class="list-group-item">

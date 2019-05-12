@@ -3,20 +3,21 @@
 {% block title %}Organiser un match{% endblock %}
 
 {% block maincontent %}
-    <div class="d-flex justify-content-center">
-        <div class="card">
-            <div class="card-header">
-            <h5>Mes rencontres </h5>
-            </div>
-            <div id="feedback"></div>
-            <ul class="list-group list-group-flush">
+    <div class="d-flex justify-content-center flex-wrap">
+        <div class="list-group">
             {% for rencontre in ListRencontre %}
-                <li class="list-group-item">
-                    <a href="{% url 'read_rencontre' rencontre.idRencontre %}">{{ rencontre }}</a>
-                    <a href="{% url 'inviter_mesamis' rencontre.idRencontre %}"class="btn btn-outline-primary"><i class="material-icons">send</i></a>
-                </li>
+                <div class="list-group-item">
+                    <div class="d-flex justify-content-center">
+                        {{ rencontre.lieuRencontre }} le {{ rencontre.dateRencontre }}
+                    </div>
+                    <div class="d-flex justify-content-between m-1">
+                        <a class="btn btn-outline-primary" href="{% url 'read_rencontre' rencontre.idRencontre %}" >Voir la rencontre</a>
+                        <a href="{% url 'inviter_mesamis' rencontre.idRencontre %}" class="btn btn-outline-primary">Inviter mes amis</a>
+                    </div>
+                </div>
+
             {% endfor %}
-            </ul>
+
         </div>
     </div>
 {% endblock %}
