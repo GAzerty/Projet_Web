@@ -51,8 +51,8 @@ def signupJoueur(request):
 
 #Retourne un Joueur à partir de l'utilisateur connecté
 def getJoueurConnecte(request):
-    utilisateur = User.objects.get(username=request.user.username)  # Je récupère l'utilisateur connecté
-    joueur = Joueur.objects.get(idJoueur=utilisateur)  # Je récupère le joueur correspondant à l'utilisateur
+    utilisateur = request.user
+    joueur = Joueur.objects.get(idJoueur=request.user)  # Je récupère le joueur correspondant à l'utilisateur
     return joueur
 
 #@login_required
@@ -63,7 +63,7 @@ def moncompteJoueur(request):
 
 #UPDATE
 def updateJoueur(request):
-    utilisateur = User.objects.get(username=request.user.username)
+    utilisateur = request.user
     joueur = Joueur.objects.get(idJoueur=utilisateur)
     if request.method == "POST":
         form = UpdateJoueurForm(request.POST)
@@ -91,7 +91,7 @@ def updateJoueur(request):
 #DELETE
 def deleteJoueur(request):
     getJoueurConnecte(request).delete()
-    utilisateur = User.objects.get(username=request.user.username).delete()
+    #utilisateur = User.objects.get(username=request.user.username).delete()
     return render(request, "index.html")
 
 
@@ -539,7 +539,7 @@ def createStade(request):
         form = StadeForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return render(request, "stade/list_stade.html")
+            return listStade(request)
         return render(request, "stade/create_stade.html", {"CreationRencontreForm": form})
 
     else:
@@ -554,10 +554,10 @@ def readStade(request,idStade):
 
 
 #LIST
-def listStade(request):
+def listStade(request,page=1):
     stades_list = Stade.objects.all()
     paginator = Paginator(stades_list, 6) #Affiche 6 stades par page
-    page = request.GET.get('page')
+
     stades = paginator.get_page(page)
     return render(request, 'stade/list_stade.html', {'stades': stades})
 
