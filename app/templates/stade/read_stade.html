@@ -1,11 +1,36 @@
 {% extends 'index.html' %}
-{% load widget_tweaks %}
+{% load static %}
+
 
 {% block title %}Stade{% endblock %}
 
 {% block maincontent %}
     <div class="d-flex justify-content-center">
-        {{ Stade }}
+
+        <div class="card mb-3">
+          <div class="row no-gutters">
+            <div class="col-md-4">
+              <img src="{{ Stade.imageStade.url }}" class="card-img" alt="Image {{ Stade }}">
+            </div>
+            <div class="col-md-8">
+              <div class="card-body">
+                <h5 class="card-title">{{ Stade }}</h5>
+                <span>Adresse : {{Stade.rueStade }}, {{Stade.codepostalStade }} {{Stade.villeStade }} </span>
+                <span>Quartier : {{Stade.quartierStade.nomQuartier}} </span>
+                <span>Nombre de terrain : {{ Stade.nombreTerrain }}</span>
+                  <div class="d-flex justify-content-center">
+                      <a href="{% url 'update_stade' Stade.idStade %}"class="btn btn-outline-primary">Mettre à jour</a>
+                      <a href="{% url 'delete_stade' Stade.idStade %}" class="btn btn-outline-danger">Supprimer le stade</a>
+                  </div>
+
+              </div>
+            </div>
+          </div>
+            <div>
+                MAP
+            </div>
+        </div>
+
     </div>
 {% endblock %}
 
