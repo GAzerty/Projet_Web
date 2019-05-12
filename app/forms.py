@@ -2,7 +2,7 @@ from django import forms
 from django.forms import ModelForm
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from app.models import Quartier, Rencontre, Stade
+from app.models import Quartier, Rencontre, Stade, Participer
 
 
 
@@ -60,9 +60,14 @@ class UpdateRencontreForm(ModelForm):
 
 
 
-#------ FORMULAIRE STADE
+#------ FORMULAIRES STADE
 class StadeForm(ModelForm):
-    #choix_quartier = QuartierChoiceField(queryset=Quartier.objects.all(), to_field_name='idQuartier', label="Quartier")
     class Meta:
         model = Stade
         exclude = ['idStade']
+
+#----- FORMULAIRES PARTICIPER
+class UpdateParticiperForm(ModelForm):
+    class Meta:
+        model = Participer
+        fields = ['nombreButs','equipe']
