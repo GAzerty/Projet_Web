@@ -1,0 +1,17 @@
+{% extends 'index.html' %}
+
+{% block title %}Ma participation{% endblock %}
+
+{% block maincontent %}
+    <div class="d-flex justify-content-center">
+        <div class="jumbotron shadow">
+            <h5>Match du {{ Participer.idRencontre.dateRencontre }}</h5>
+            <span>Nombre de buts marqués : {{ Participer.nombreButs }}</span>
+            <span>Équipe : {{ Participer.equipe }} </span>
+            <div class="d-flex justify-content-center">
+                <a href="{% url 'update_participer' Participer.idRencontre.idRencontre %}" class="btn btn-outline-primary">Modifier</a>
+                <a href="{% url 'delete_participer' Participer.idRencontre.idRencontre %}" class="btn btn-outline-danger">Supprimer</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
