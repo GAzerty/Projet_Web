@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.db.models import Q
-from app.forms import SignupJoueurForm, UpdateJoueurForm, CreationRencontreForm, StadeForm
+from app.forms import SignupJoueurForm, UpdateJoueurForm, CreationRencontreForm, StadeForm, UpdateParticiperForm
 from django.contrib.auth.models import User
 from app.models import Joueur, Quartier, Amis, Rencontre, Stade, Inviter, Participer
 from django.http import JsonResponse
@@ -52,6 +52,7 @@ def signupJoueur(request):
 #Retourne un Joueur à partir de l'utilisateur connecté
 def getJoueurConnecte(request):
     utilisateur = request.user
+    print(request.user.id)
     joueur = Joueur.objects.get(idJoueur=request.user)  # Je récupère le joueur correspondant à l'utilisateur
     return joueur
 
@@ -267,9 +268,7 @@ def createRencontre(request):
             new_rencontre.lieuRencontre = stade
             new_rencontre.save()
             joueur = getJoueurConnecte(request)
-            choix_equipe = random.choice(['LOC', 'VIS', ])  # L'équipe du joueur est décidée aléatoirement
-            new_participer = Participer(idJoueur=joueur,idRencontre=new_rencontre,equipe=choix_equipe) #Le joueur qui a créé la rencontre participe automatiquement à la rencontre
-            new_participer.save()
+            createParticiper(joueur,new_rencontre)  #Le joueur qui a créé la rencontre participe automatiquement à la rencontre
             return inviterAmis(request,new_rencontre.idRencontre)
         else:
             return render(request, "rencontre/formRencontre.html", {"RencontreForm":form,"title":title,"buttonText":buttonText})
@@ -288,7 +287,7 @@ def readRencontre(request,idRencontre):
     return render(request, "rencontre/readRencontre.html",{"Rencontre":rencontre,"JoueursLocaux":participantsLocaux,"JoueursVisiteurs":participantsVisiteurs,"JoueursInvite":listInvite,})
 
 #LIST
-#Retourne la liste des rencontre auquel le joueur participer
+#Retourne la liste des rencontre auquel le joueur participe
 def listRencontre(request):
     joueur = getJoueurConnecte(request)
     listParticiper = Participer.objects.filter(idJoueur=joueur)
@@ -345,6 +344,7 @@ def inviterAmis(request,idRencontre):
     #Init des valeurs de retour
     succes=True
     feedback=""
+
     joueur = getJoueurConnecte(request)
     listAmis = mesAmis(joueur) #Récupère les amis du joueur connecté
     listJoueurAmis =[]
@@ -437,9 +437,7 @@ def acceptInviter(request):
             succes="False"
             feedback = "Aucune invitation correspondant à cette rencontre n'a été trouvée."
         else: #Rencontre trouvée
-            choix_equipe = random.choice(['LOC', 'VIS',]) #L'équipe du joueur est décidée aléatoirement
-            new_participer = Participer(idJoueur=joueur, idRencontre=rencontre[0],equipe=choix_equipe)
-            new_participer.save()
+            createParticiper(joueur, rencontre[0]) #Le joueur participe à la rencontre
             invitation[0].delete()  # On peut supprimer l'invitation désormais
             succes=True
             feedback = "Invitation acceptée !"
@@ -513,23 +511,63 @@ def deleteInviter(request,username,idRencontre,codeSuppression):
 # ---- VIEWS PARTICIPER
 
 #CREATE
+#Prend en paramètre un joueur et une rencontre
+#Cette fonction n'est pas accessible par l'utilisateur
+#La création d'un participation ce fait de deux manière:
+# 1-L'utilisateur organise une rencontre, il participe automatiquement à sa rencontre
+# 2-L'utilisateur est invité, il valide son invitation et participe ainsi au match.
+def createParticiper(joueur,rencontre):
+    choix_equipe = random.choice(['LOC', 'VIS', ])  # L'équipe du joueur est décidée aléatoirement
+    new_participer = Participer(idJoueur=joueur, idRencontre=rencontre, equipe=choix_equipe)
+    new_participer.save()
+
 
 #READ
+#Prend en paramètre l'id de la rencontre dont on souhaite avoir la participation du joueur connecté
+def readParticiper(request,idRencontre):
+    rencontre = get_object_or_404(Rencontre, idRencontre=idRencontre) #Récupère la rencontre dont l'id est en paramètre
+    joueur = getJoueurConnecte(request) #Récupère le joueur associé à l'utilisateur
+    participer = get_object_or_404(Participer, idJoueur=joueur, idRencontre=rencontre) #Récupère la participation du joueur à la rencontre
+    return render(request, "participer/readParticiper.html", {"Participer":participer,})
+
 
 #UPDATE
+#La seule chose modifiable dans une participation est le nombre de buts marqué et le choix de l'équipe.
+def updateParticiper(request,idRencontre):
+    rencontre = get_object_or_404(Rencontre, idRencontre=idRencontre) #Récupère la rencontre dont l'id est en paramètre
+    joueur = getJoueurConnecte(request) #Récupère le joueur associé à l'utilisateur
+    participer = get_object_or_404(Participer, idJoueur=joueur, idRencontre=rencontre) #Récupère la participation du joueur à la rencontre
+
+    if request.method == "POST":
+        form = UpdateParticiperForm(request.POST)
+        if form.is_valid():
+            participer.nombreButs = form.cleaned_data['nombreButs']
+            participer.equipe = form.cleaned_data['equipe']
+            participer.save()
+            return readRencontre(request,idRencontre)
+        else:
+            return render(request, "participer/updateParticiper.html", {"UpdateParticiperForm":form,})
+    dataform = {
+        "nombreButs":participer.nombreButs,
+    }
+    form = UpdateParticiperForm(dataform)
+    return render(request, "participer/updateParticiper.html", {"UpdateParticiperForm":form,})
+
 
 #DELETE
+def deleteParticiper(request,idRencontre):
+    rencontre = get_object_or_404(Rencontre, idRencontre=idRencontre) #Récupère la rencontre dont l'id est en paramètre
+    joueur = getJoueurConnecte(request) #Récupère le joueur associé à l'utilisateur
+    participer = get_object_or_404(Participer, idJoueur=joueur, idRencontre=rencontre) #Récupère la participation du joueur à la rencontre
+
+    if request.method == "DELETE":
+        participer.delete()
+        return listRencontre(request)
+
+    return render(request, "delete.html", {"ObjetDelete":participer})
 
 
 
-
-
-
-
-
-
-
-# --- POUR L'ADMIN
 
 # ---- VIEWS STADE
 
@@ -540,11 +578,11 @@ def createStade(request):
         if form.is_valid():
             form.save()
             return listStade(request)
-        return render(request, "stade/create_stade.html", {"CreationRencontreForm": form})
+        return render(request, "stade/create_stade.html", {"StadeForm": form})
 
     else:
         form = StadeForm()
-        return render(request, "stade/create_stade.html", {"CreationRencontreForm":form})
+        return render(request, "stade/create_stade.html", {"StadeForm":form})
 
 
 #READ
@@ -576,7 +614,7 @@ def updateStade(request,idStade):
             stade.imageStade = form.cleaned_data['imageStade']
             stade.save()
             return readStade(request,stade.idStade)
-        return render(request, "stade/create_stade.html", {"CreationRencontreForm": form})
+        return render(request, "stade/create_stade.html", {"StadeForm": form})
 
     else:
         formdata = {
@@ -586,9 +624,10 @@ def updateStade(request,idStade):
             "codepostalStade": stade.codepostalStade,
             "quartierStade": stade.quartierStade,
             "nombreTerrain": stade.nombreTerrain,
+            "imageStade": stade.imageStade.url,
         }
         form = StadeForm(formdata)
-        return render(request, "stade/create_stade.html", {"CreationRencontreForm":form})
+        return render(request, "stade/create_stade.html", {"StadeForm":form})
 
 
 #DELETE
