@@ -5,14 +5,16 @@
 
 {% block maincontent %}
     <div>
-        <div class="card-deck">
+        <div class="card-columns">
             {% for stade in stades %}
                 <div class="card">
-                    <img src="{{ stade.imageStade.url }}" class="card-img-top"  alt="Image {{ stade }}">
+                    <img src="{{ stade.imageStade.url }}" class="card-img-top image-stade"  alt="Image {{ stade }}">
                     <div class="card-body">
                         <h5 class="card-title">{{ stade }}</h5>
                         <span>Quartier : {{stade.quartierStade.nomQuartier}} </span>
-                        <a href="{% url 'read_stade' stade.idStade %}" class="btn btn-outline-primary">Voir le stade</a>
+                        <div class="d-flex justify-content-center">
+                            <a href="{% url 'read_stade' stade.idStade %}" class="btn btn-outline-primary">Voir le stade</a>
+                        </div>
                     </div>
                 </div>
             {% endfor %}
@@ -22,11 +24,11 @@
     <nav class="nav_pagination d-flex justify-content-center mt-5">
       <ul class="pagination">
           {% if stades.has_previous %}
-            <li class="page-item"><a class="page-link" href="{% url 'list_stade' stades.previous_page_number %}"> << </a></li>
+            <li class="page-item"><a class="page-link" href="{% url 'list_stade' stades.previous_page_number %}"> {{ stades.previous_page_number }} </a></li>
           {% endif %}
-            <li class="page-item"><a class="page-link" href="#">{{ stades.number }}</a></li>
+            <li class="page-item active"><a class="page-link" href="#">{{ stades.number }}</a></li>
           {% if stades.has_next %}
-            <li class="page-item"><a class="page-link" href="{% url 'list_stade' stades.next_page_number %}"> >> </a></li>
+            <li class="page-item"><a class="page-link" href="{% url 'list_stade' stades.next_page_number %}"> {{ stades.next_page_number}} </a></li>
           {% endif %}
       </ul>
     </nav>

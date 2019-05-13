@@ -15,14 +15,19 @@
             <div class="col-md-8">
               <div class="card-body">
                 <h5 class="card-title">{{ Stade }}</h5>
-                <span>Adresse : {{Stade.rueStade }}, {{Stade.codepostalStade }} {{Stade.villeStade }} </span>
-                <span>Quartier : {{Stade.quartierStade.nomQuartier}} </span>
-                <span>Nombre de terrain : {{ Stade.nombreTerrain }}</span>
-                  <div class="d-flex justify-content-center">
-                      <a href="{% url 'update_stade' Stade.idStade %}"class="btn btn-outline-primary">Mettre à jour</a>
-                      <a href="{% url 'delete_stade' Stade.idStade %}" class="btn btn-outline-danger">Supprimer le stade</a>
+                  <div class="d-flex align-items-start">
+                      <ul class="list-group list-group-flush">
+                          <li class="list-group-item">
+                            <span>Adresse : {{Stade.rueStade }}, {{Stade.codepostalStade }} {{Stade.villeStade }} </span>
+                          </li>
+                          <li class="list-group-item">
+                              <span>Quartier : {{Stade.quartierStade.nomQuartier}} </span>
+                          </li>
+                          <li class="list-group-item">
+                              <span>Nombre de terrain : {{ Stade.nombreTerrain }}</span>
+                          </li>
+                      </ul>
                   </div>
-
               </div>
             </div>
           </div>
