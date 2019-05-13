@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from app.models import Joueur, Quartier, Amis, Rencontre, Stade, Inviter, Participer
 from django.http import JsonResponse
 from django.core.paginator import Paginator
+from datetime import date
 import random
 
 # ---- VIEWS BASIQUES
@@ -20,7 +21,6 @@ def logoutJoueur(request):
 #change psswd()
 
 #delete account()
-
 
 
 # ---- VIEWS JOUEUR
@@ -51,15 +51,13 @@ def signupJoueur(request):
 
 #Retourne un Joueur à partir de l'utilisateur connecté
 def getJoueurConnecte(request):
-    utilisateur = request.user
-    print(request.user.id)
     joueur = Joueur.objects.get(idJoueur=request.user)  # Je récupère le joueur correspondant à l'utilisateur
     return joueur
 
 #@login_required
 def moncompteJoueur(request):
     joueur = getJoueurConnecte(request)
-    return render(request, "joueur/account.html", {'Joueur': joueur}) #Je renvoie le joueur à la template
+    return render(request, "joueur/account.html", {'Joueur': joueur,}) #Je renvoie le joueur à la template
 
 
 #UPDATE
@@ -261,7 +259,6 @@ def createRencontre(request):
     buttonText="Créer la rencontre"
     if request.method == "POST":
         form = CreationRencontreForm(request.POST)
-        print(request.POST)
         if form.is_valid():
             new_rencontre = form.save(commit=False) #Création d'une rencontre, commit=False empêche la sauvegarde du nouvel objet
             stade = get_object_or_404(Stade, nomStade=form.cleaned_data['choix_stade'])
@@ -284,7 +281,9 @@ def readRencontre(request,idRencontre):
     participantsLocaux = Participer.objects.filter(idRencontre=rencontre,equipe="LOC")
     participantsVisiteurs = Participer.objects.filter(idRencontre=rencontre, equipe="VIS")
     listInvite = Inviter.objects.filter(idRencontre=rencontre)
-    return render(request, "rencontre/readRencontre.html",{"Rencontre":rencontre,"JoueursLocaux":participantsLocaux,"JoueursVisiteurs":participantsVisiteurs,"JoueursInvite":listInvite,})
+    nbParticipant = len(participantsLocaux)+len(participantsVisiteurs) #Le nombre de participant. Si il y a 1 participant, le boutton de suppression s'affiche à l'utilisateur.
+    heure_match = rencontre.toString_Heure()
+    return render(request, "rencontre/readRencontre.html",{"Rencontre":rencontre,"JoueursLocaux":participantsLocaux,"JoueursVisiteurs":participantsVisiteurs,"JoueursInvite":listInvite,"NbJoueurs":nbParticipant,"HeureMatch":heure_match,})
 
 #LIST
 #Retourne la liste des rencontre auquel le joueur participe
@@ -537,21 +536,25 @@ def updateParticiper(request,idRencontre):
     rencontre = get_object_or_404(Rencontre, idRencontre=idRencontre) #Récupère la rencontre dont l'id est en paramètre
     joueur = getJoueurConnecte(request) #Récupère le joueur associé à l'utilisateur
     participer = get_object_or_404(Participer, idJoueur=joueur, idRencontre=rencontre) #Récupère la participation du joueur à la rencontre
+    nbButs_possible = participer.idRencontre.dateRencontre > date.today()  # Le joueur peut modifier son score uniquement si la date du match est passé
 
     if request.method == "POST":
         form = UpdateParticiperForm(request.POST)
         if form.is_valid():
-            participer.nombreButs = form.cleaned_data['nombreButs']
-            participer.equipe = form.cleaned_data['equipe']
-            participer.save()
+            if nbButs_possible:
+                participer.nombreButs = form.cleaned_data['nombreButs']
+            else:
+                participer.equipe = form.cleaned_data['equipe']
+                participer.nombreButs = 0
+                participer.save()
             return readRencontre(request,idRencontre)
         else:
             return render(request, "participer/updateParticiper.html", {"UpdateParticiperForm":form,})
     dataform = {
-        "nombreButs":participer.nombreButs,
+        "equipe":participer.equipe,
     }
     form = UpdateParticiperForm(dataform)
-    return render(request, "participer/updateParticiper.html", {"UpdateParticiperForm":form,})
+    return render(request, "participer/updateParticiper.html", {"UpdateParticiperForm":form,"Possible":nbButs_possible})
 
 
 #DELETE
