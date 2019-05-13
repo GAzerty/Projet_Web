@@ -67,6 +67,10 @@ class Rencontre(models.Model):
         db_table = "rencontre"
 
 
+    #Retourne l'heure de la rencontre au format Heures+'h'+"Minutes
+    def toString_Heure(self):
+        StrHeure = str(self.heureRencontre)[0:2]+"h"+str(self.heureRencontre)[2:4]
+        return StrHeure
 
 
 #MODEL - INVITER
