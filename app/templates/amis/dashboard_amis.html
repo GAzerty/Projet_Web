@@ -10,10 +10,11 @@
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">Mes amis</h5>
+            <div id="feedback_mesamis"></div>
             <ul  class="list-group list-group-flush">
                 {% for joueur in listeAmis %}
                 <li class="list-group-item">{{ joueur.idJoueur.username }}
-                <button class="btn btn-outline-danger my-2 my-sm-0" onclick="supprimer_amis('{{ ami.joueur1Amis.idJoueur.username }}')"><i class="material-icons">clear</i></button>
+                <button class="btn btn-outline-danger my-2 my-sm-0" onclick="supprimer_amis('{{ joueur.idJoueur.id }}')"><i class="material-icons">clear</i></button>
                 </li>
                 {% endfor %}
             </ul>
@@ -27,7 +28,7 @@
             <p class="card-text">Tapez le nom d'utilisateur de votre ami et lancez une recherche.</p>
             <div id="feedback_recherche_ami"></div>
             <form>
-                <input class="form-control mr-sm-2" type="search" placeholder="Nom d'utilisateur" name="recherche_usernameAmis" id="id_rechercheUsername">
+                <input class="form-control mr-sm-2" type="search" placeholder="Nom d'utilisateur" name="rechercheUsername" id="id_rechercheUsername">
                 <div class="d-flex justify-content-center m-2">
                     <a id="btn_rechercheUsername"  class="btn btn-outline-success my-2 my-sm-0 m-1" >Rechercher</a>
                 </div>
@@ -38,7 +39,7 @@
             <p class="card-text">Tapez le nom d'utilisateur et envoyez votre demande.</p>
             <div id="feedback_demande_ami"></div>
             <form>
-                <input class="form-control mr-sm-2" type="search" placeholder="Nom d'utilisateur" name="demande_usernameAmis" id="id_demande_usernameAmis">
+                <input class="form-control mr-sm-2" type="search" placeholder="Nom d'utilisateur" name="demandeUsername" id="id_demandeUsername">
                 <div class="d-flex justify-content-center m-2">
                     <a id="btn_demande_usernameAmis" class="btn btn-outline-success my-2 my-sm-0" >Envoyer</a>
                 </div>
@@ -50,11 +51,12 @@
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">Demandes reçues</h5>
+                <div id="feedback_demande_reçue"></div>
                 <ul  class="list-group list-group-flush">
                     {% for demande in listeDemandes %}
                         <li class="list-group-item"> De : {{ demande.joueur1Amis.idJoueur.username }}
-                            <button class="btn btn-outline-primary" onclick="accepter_amis('{{ demande.joueur1Amis.idJoueur.username }}')"><i class="material-icons">check_circle</i></button>
-                            <button class="btn btn-outline-danger" onclick="supprimer_amis('{{ demande.joueur1Amis.idJoueur.username }}')"><i class="material-icons">clear</i></button>
+                            <button class="btn btn-outline-primary" onclick="accepter_amis('{{ demande.joueur1Amis.idJoueur.id }}')"><i class="material-icons">check_circle</i></button>
+                            <button class="btn btn-outline-danger" onclick="supprimer_amis('{{ demande.joueur1Amis.idJoueur.id }}')"><i class="material-icons">clear</i></button>
                         </li>
                     {% endfor %}
                 </ul>
