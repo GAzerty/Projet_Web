@@ -45,11 +45,15 @@
             </ul>
           </div>
           <div class="card-footer text-muted">
+              {% csrf_token %}
             <span>Joueurs invités </span>
             <ul class="list-group-flush">
                 {% for invite in JoueursInvite %}
                 <li class="list-group-item">
                     {{ invite.idJoueur.idJoueur.username  }}
+                    {% if request.user == invite.joueurDemandeur.idJoueur %}
+                        <button class="btn btn-outline-danger" onclick="annuler_invit('{{ invite.idJoueur.idJoueur.id }}','{{ Rencontre.idRencontre }}')">Annuler l'invitation</button>
+                    {% endif %}
                 </li>
                 {% endfor %}
             </ul>
