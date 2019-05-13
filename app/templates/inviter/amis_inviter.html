@@ -5,23 +5,20 @@
 {% block maincontent %}
     <div class="d-flex justify-content-center">
         {% csrf_token %}
-        {% if succes %}
-        <div class="card">
+        <div class="card shadow">
             <div class="card-header">
-            <h5>Rencontre du {{ Rencontre.dateRencontre }} à {{ Rencontre.heureRencontre }}.</h5>
+            <h5>Inviter mes amis au match</h5>
+            <span>Rencontre du {{ Rencontre.dateRencontre }} à {{ Rencontre.heureRencontre }} : {{ Rencontre.lieuRencontre }}.</span>
             </div>
             <div id="feedback"></div>
             <ul class="list-group list-group-flush">
             {% for joueur in listJoueurAmis %}
-                <li class="list-group-item">
-                    {{ joueur.idJoueur.username }}
-                    <button class="btn btn-outline-primary" onclick="inviter_amis('{{ joueur.idJoueur.id }}','{{ Rencontre.idRencontre }}')"><i class="material-icons">check_circle</i></button>
+                <li class="d-flex justify-content-between align-items-center list-group-item">
+                    <span>{{ joueur.idJoueur.username }}</span>
+                    <button class="btn btn-outline-primary" onclick="inviter_amis('{{ joueur.idJoueur.id }}','{{ Rencontre.idRencontre }}')"><i class="material-icons">add_circle_outline</i></button>
                 </li>
             {% endfor %}
             </ul>
         </div>
-        {% else %}
-        {{ feedback }}
-        {% endif %}
     </div>
 {% endblock %}
