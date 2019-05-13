@@ -15,7 +15,7 @@
                 <li class="list-group-item">
                     <a href="{% url 'read_rencontre' invitation.idRencontre.idRencontre %}">Invitation de {{ invitation.joueurDemandeur.idJoueur.username }}</a>
                     <button class="btn btn-outline-primary" onclick="accepter_invit('{{ invitation.idRencontre.idRencontre }}')"><i class="material-icons">check_circle</i></button>
-                    <button class="btn btn-outline-danger" onclick="rejeter_invit('{{ invitation.joueurDemandeur.idJoueur.username }}','{{ invitation.idRencontre.idRencontre }}')"><i class="material-icons">clear</i></button>
+                    <button class="btn btn-outline-danger" onclick="rejeter_invit('{{ invitation.joueurDemandeur.idJoueur.id }}','{{ invitation.idRencontre.idRencontre }}')"><i class="material-icons">clear</i></button>
                 </li>
             {% endfor %}
             </ul>

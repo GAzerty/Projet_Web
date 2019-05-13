@@ -15,7 +15,7 @@
             {% for joueur in listJoueurAmis %}
                 <li class="list-group-item">
                     {{ joueur.idJoueur.username }}
-                    <button class="btn btn-outline-primary" onclick="inviter_amis('{{ joueur.idJoueur.username }}','{{ Rencontre.idRencontre }}')"><i class="material-icons">check_circle</i></button>
+                    <button class="btn btn-outline-primary" onclick="inviter_amis('{{ joueur.idJoueur.id }}','{{ Rencontre.idRencontre }}')"><i class="material-icons">check_circle</i></button>
                 </li>
             {% endfor %}
             </ul>
