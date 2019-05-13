@@ -1,6 +1,8 @@
 var url;
 var data;
 var reponse;
+var method;
+
 
 function demande_amis_traitement(reponse){
     var feeback_html = document.getElementById("feedback_demande_ami");
@@ -11,15 +13,20 @@ function demande_amis_traitement(reponse){
 function recherche_amis_traitement(reponse){
     var feeback_html = document.getElementById("feedback_recherche_ami");
     feeback_html.innerHTML = reponse.feedback;
+    if(reponse.succes){
+        document.getElementById('id_demandeUsername').value=reponse.username;
+    }
 }
 
 function accepter_amis_traitement(reponse){
+    document.location.reload(true);
     var feeback_html = document.getElementById("feedback");
     feeback_html.innerHTML = reponse.feedback;
 }
 
 function supprimer_amis_traitement(reponse){
-    var feeback_html = document.getElementById("feedback");
+    document.location.reload(true);
+    var feeback_html = document.getElementById("feedback_mesamis");
     feeback_html.innerHTML = reponse.feedback;
 }
 
@@ -28,8 +35,9 @@ function inviter_amis_traitement(reponse){
     feeback_html.innerHTML = reponse.feedback;
 }
 
-function accepter_invit_traitement(reponse){
-    var feeback_html = document.getElementById("feedback");
+function reponse_invit_traitement(reponse){
+    document.location.reload(true);
+    var feeback_html = document.getElementById("feedback_demande_reçue");
     feeback_html.innerHTML = reponse.feedback;
 }
 
@@ -52,7 +60,7 @@ function demande_amis_click(){
     url = "/friend/sendto/";
     var inputs = document.getElementsByTagName("input");
     var csrf = "csrfmiddlewaretoken="+inputs.csrfmiddlewaretoken.value;
-    var username = document.getElementById('id_demande_usernameAmis').name+"="+document.getElementById('id_demande_usernameAmis').value
+    var username = document.getElementById('id_demandeUsername').name+"="+document.getElementById('id_demandeUsername').value
     data = csrf+"&"+username;
     requeteAjax(url,data,demande_amis_traitement);
 }
@@ -67,19 +75,20 @@ function recherche_amis_click(){
 }
 
 
-function accepter_amis(username){
+function accepter_amis(idUser){
     url = "/friend/accept/";
     var inputs = document.getElementsByTagName("input");
     var csrf = "csrfmiddlewaretoken="+inputs.csrfmiddlewaretoken.value;
-    data = csrf+"&"+"username_sender="+username;
+    data = csrf+"&"+"User="+idUser;
     requeteAjax(url,data,accepter_amis_traitement);
 }
 
-function supprimer_amis(username){
+function supprimer_amis(idUser){
+    method = "DELETE"
     url = "/friend/delete/";
     var inputs = document.getElementsByTagName("input");
     var csrf = "csrfmiddlewaretoken="+inputs.csrfmiddlewaretoken.value;
-    data = csrf+"&"+"username="+username;
+    data = csrf+"&"+"User="+idUser;
     requeteAjax(url,data,supprimer_amis_traitement);
 }
 
@@ -89,13 +98,13 @@ document.getElementById("btn_rechercheUsername").onclick = recherche_amis_click;
 
 //-----INVITER
 
-function inviter_amis(username,idrencontre){
+function inviter_amis(idUser,idrencontre){
     url = "/rencontre/inviter/";
     var inputs = document.getElementsByTagName("input");
     var csrf = "csrfmiddlewaretoken="+inputs.csrfmiddlewaretoken.value;
-    username_send = "username="+username;
+    id_send = "User="+idUser;
     idrencontre_send = "idRencontre="+idrencontre;
-    data = csrf+"&"+username_send+"&"+idrencontre_send;
+    data = csrf+"&"+id_send+"&"+idrencontre_send;
     requeteAjax(url,data,inviter_amis_traitement);
 }
 
@@ -105,17 +114,29 @@ function accepter_invit(idrencontre){
     var csrf = "csrfmiddlewaretoken="+inputs.csrfmiddlewaretoken.value;
     idrencontre_send = "idRencontre="+idrencontre;
     data = csrf+"&"+idrencontre_send;
-    requeteAjax(url,data,accepter_invit_traitement);
+    requeteAjax(url,data,reponse_invit_traitement);
 }
 
-function rejeter_invit(username,idrencontre){
+function rejeter_invit(idJoueur,idrencontre){
+    method = "DELETE"
     url = "/rencontre/invitation/rejeter";
     var inputs = document.getElementsByTagName("input");
     var csrf = "csrfmiddlewaretoken="+inputs.csrfmiddlewaretoken.value;
-    username_send = "username="+username;
+    id_send = "User="+idJoueur;
     idrencontre_send = "idRencontre="+idrencontre;
-    data = csrf+"&"+username_send+"&"+idrencontre_send;
-    requeteAjax(url,data,accepter_invit_traitement);
+    data = csrf+"&"+id_send+"&"+idrencontre_send;
+    reponse = requeteAjax(url,data,reponse_invit_traitement);
+}
+
+function annuler_invit(idJoueur,idrencontre){
+    method = "DELETE"
+    url = "/rencontre/invitation/annuler";
+    var inputs = document.getElementsByTagName("input");
+    var csrf = "csrfmiddlewaretoken="+inputs.csrfmiddlewaretoken.value;
+    id_send = "User="+idJoueur;
+    idrencontre_send = "idRencontre="+idrencontre;
+    data = csrf+"&"+id_send+"&"+idrencontre_send;
+    reponse = requeteAjax(url,data,reponse_invit_traitement);
 }
 
 //accepter_invit et rejeter_invit ont certainement les mêmes fonctions de traitement - A FAIRE
