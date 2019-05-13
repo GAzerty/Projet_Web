@@ -131,8 +131,8 @@ def dashboardAmis(request):
 #View qui recherche un ami, à partir d'un username
 #Réalisé via AJAX
 def rechercheAmis(request):
-    usernameAmis = request.POST.get('recherche_usernameAmis')  #Récupération de l'username
-    utilisateur = User.objects.filter(username=usernameAmis)
+    usernameAmis = request.POST.get('rechercheUsername')  #Récupération de l'username du joueur que l'on recherche
+    utilisateur = User.objects.filter(username=usernameAmis) #Un username est unique pour chaque joueur
     if not utilisateur:# Si on ne trouve pas l'utilisateur en question
         existe = False
         feedback = "Aucun joueur ne correspond à ce nom"
@@ -142,7 +142,7 @@ def rechercheAmis(request):
         feedback = "Joueur trouvé !"
 
     reponse = {
-        'existe':existe,
+        'succes':existe,
         'feedback':feedback,
         'username':usernameAmis,
     }
@@ -152,7 +152,7 @@ def rechercheAmis(request):
 #Creation de Amis, prend en paramètre le username de l'amis à qui l'on envoie la demande
 #Réalisé via AJAX
 def demandeAmis(request):
-    usernameAmis = request.POST.get('demande_usernameAmis') #Récupération de l'username
+    usernameAmis = request.POST.get('demandeUsername') #Récupération de l'username
 
     utilisateur_recipient =  User.objects.filter(username=usernameAmis)#NB: Un unsername est unique pour chaque User
     if not utilisateur_recipient:
@@ -189,8 +189,8 @@ def demandeAmis(request):
 #Le joueur accepte la demande qui lui a été envoyée
 #Réalisé via AJAX
 def accepteAmis(request):
-    username_sender = request.POST.get('username_sender')
-    utilisateur_sender = User.objects.filter(username=username_sender)
+    idUser_sender = request.POST.get('User')
+    utilisateur_sender = User.objects.filter(id=idUser_sender)
     if not utilisateur_sender:        #Le username_sender n'appartient à aucun utilisateur, possible tentative d'usurpation
         succes = False
         feedback = "Aucun utilisateur ne correspond"
@@ -204,12 +204,12 @@ def accepteAmis(request):
         else:
             if relation_amis[0].amitie_valide():
                 succes = False
-                feedback = "Vous avez déjà accepté "+username_sender+" en ami !"
+                feedback = "Vous avez déjà accepté "+utilisateur_sender[0].username+" en ami !"
             else:
                 relation_amis[0].etatJoueur2 = "AC"
                 relation_amis[0].save()
                 succes = True
-                feedback = "Vous avez accepté " + username_sender + " en ami !"
+                feedback = "Vous avez accepté " + utilisateur_sender[0].username + " en ami !"
 
     reponse = {
         'succes' : succes,
@@ -221,8 +221,8 @@ def accepteAmis(request):
 #Refuser une demande & Annuler une demande
 #Supprime la liaison entre deux joueur.
 def supprimerAmis(request):
-    username= request.POST.get('username')
-    utilisateur = User.objects.filter(username=username)
+    idUser= request.POST.get('User')
+    utilisateur = User.objects.filter(id=idUser)
     if not utilisateur:        #Le username_sender n'appartient à aucun utilisateur, possible tentative d'usurpation
         succes = False
         feedback = "Aucun utilisateur ne correspond."
@@ -339,7 +339,7 @@ def deleteRencontre(request,idRencontre):
 
 # ---- VIEWS INVITER
 
-#Retourne une page permettant d'inviter les mais du joueur connecté à la rencontre passé en paramètre
+#Retourne une page permettant d'inviter les amis du joueur connecté à la rencontre passé en paramètre
 def inviterAmis(request,idRencontre):
     #Init des valeurs de retour
     succes=True
@@ -348,10 +348,10 @@ def inviterAmis(request,idRencontre):
     joueur = getJoueurConnecte(request)
     listAmis = mesAmis(joueur) #Récupère les amis du joueur connecté
     listJoueurAmis =[]
-
+    print(listAmis)
     for ami in listAmis:
         listJoueurAmis.append(ami.monAmi(joueur)) #Je récupère les joueur ami avec le joueur passé en paramètre
-
+    print(listJoueurAmis)
     rencontre = get_object_or_404(Rencontre, idRencontre=idRencontre)
     participation = Participer.objects.filter(idJoueur=joueur, idRencontre=rencontre)
     if not participation:
@@ -362,10 +362,10 @@ def inviterAmis(request,idRencontre):
 
 #CREATE
 def createInviter(request):
-    username= request.POST.get('username') #Récupération de l'username
+    idUser= request.POST.get('User') #Récupération de l'id du joueur
     idRencontre = request.POST.get('idRencontre')  # Récupération de l'username
 
-    utilisateur_recipient =  User.objects.filter(username=username)#NB: Un unsername est unique pour chaque User
+    utilisateur_recipient =  User.objects.filter(id=idUser)#NB: Un unsername est unique pour chaque User
     rencontre = Rencontre.objects.filter(idRencontre=idRencontre)
     if not utilisateur_recipient:
         succes=False
@@ -393,7 +393,7 @@ def createInviter(request):
             feedback = "Votre invitation à été envoyée avec succès."
         else:
             succes=False
-            feedback = username+" est déjà invité à cette rencontre."
+            feedback = utilisateur_recipient[0].username+" est déjà invité à cette rencontre."
 
     reponse = {
         "succes":succes,
@@ -450,27 +450,27 @@ def acceptInviter(request):
 
 
 #Rejeter une invitation reçue
-#Récupère le username du joueurDemandeur et l'id de la rencontre
+#Récupère le id du joueurDemandeur et l'id de la rencontre
 #Fait ensuite appel à deleteInviter() en lui précisant le code de suppression
 def rejeterInvitation(request):
-    username_joueurDemandeur = request.POST.get('username')  # Récupération de l'username du joueur demandeur
+    id_joueurDemandeur = request.POST.get('User')  # Récupération de l'id du joueur demandeur
     idRencontre = request.POST.get('idRencontre')  # Récupération de l'idRencontre
     codeSuppression = 0 #La suppression provient de la fonction rejeterInvitation
-    return deleteInviter(request,username_joueurDemandeur,idRencontre,codeSuppression)
+    return deleteInviter(request,id_joueurDemandeur,idRencontre,codeSuppression)
 
 
 #Annuler une invitation envoyé
-#Récupère le username du joueur invité (idJoueur) et l'id de la rencontre
+#Récupère le id du joueur invité (idJoueur) et l'id de la rencontre
 #Fait ensuite appel à deleteInviter() en lui précisant le code de suppression
 def annulerInvitation(request):
-    username_joueurInvite = request.POST.get('username')  # Récupération de l'username du joueur invité
+    id_joueurInvite = request.POST.get('User')  # Récupération de l'id du joueur invité
     idRencontre = request.POST.get('idRencontre')  # Récupération de l'idRencontre
     codeSuppression = 1 #La suppression provient de la fonction annulerInvitation
-    return deleteInviter(request, username_joueurInvite, idRencontre, codeSuppression)
+    return deleteInviter(request, id_joueurInvite, idRencontre, codeSuppression)
 
 #DELETE
-def deleteInviter(request,username,idRencontre,codeSuppression):
-    utilisateur_autre = User.objects.filter(username=username)  # NB: Un unsername est unique pour chaque User
+def deleteInviter(request,idJoueur,idRencontre,codeSuppression):
+    utilisateur_autre = User.objects.filter(id=idJoueur)
     rencontre = Rencontre.objects.filter(idRencontre=idRencontre)
 
     if not utilisateur_autre:
