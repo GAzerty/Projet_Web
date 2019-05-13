@@ -34,3 +34,10 @@ nav {
 .image-stade{
     height:200px;
 }
+
+
+/*Override*/
+.card-footer, .jumbotron{
+    background-color:white;
+}
+
