@@ -30,12 +30,12 @@
             <a class="nav-link" href="{% url 'account' %}">#{{ request.user.username }}</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'dashboard_amis' %}">Amis</a>
+            <a class="nav-link" href="{% url 'dashboard_amis' %}">Amis <span class="badge badge-primary">0</span></a>
           </li>
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Matchs</a>
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Matchs <span class="badge badge-primary">0</span> </a>
             <div class="dropdown-menu">
-              <a class="dropdown-item"  href="{% url 'list_invitations_joueur' %}">Nouvelles Invitations</a>
+              <a class="dropdown-item"  href="{% url 'list_invitations_joueur' %}">Invitations <span class="badge badge-primary">0</span></a>
               <a class="dropdown-item"  href="{% url 'list_rencontre' %}">Tous mes matchs</a>
               <a class="dropdown-item" href="{% url 'create_rencontre' %}" >Organiser un match</a>
             </div>
