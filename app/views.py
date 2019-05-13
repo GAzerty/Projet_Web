@@ -594,7 +594,7 @@ def readStade(request,idStade):
 #LIST
 def listStade(request,page=1):
     stades_list = Stade.objects.all()
-    paginator = Paginator(stades_list, 6) #Affiche 6 stades par page
+    paginator = Paginator(stades_list, 3) #Affiche 3 stades par page
 
     stades = paginator.get_page(page)
     return render(request, 'stade/list_stade.html', {'stades': stades})
