@@ -5,7 +5,7 @@
 {% block maincontent %}
     <div class="d-flex justify-content-center">
         {% csrf_token %}
-        <div class="card">
+        <div class="card shadow">
             <div class="card-header">
             <h5>Invitations en attente</h5>
             </div>
@@ -18,6 +18,11 @@
                     <button class="btn btn-outline-danger" onclick="rejeter_invit('{{ invitation.joueurDemandeur.idJoueur.id }}','{{ invitation.idRencontre.idRencontre }}')"><i class="material-icons">clear</i></button>
                 </li>
             {% endfor %}
+                {% if not Invitations %}
+                <li class="list-group-item d-flex justify-content-center">
+                    Aucune invitations
+                </li>
+                {% endif %}
             </ul>
         </div>
     </div>

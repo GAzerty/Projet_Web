@@ -18,6 +18,11 @@
                     <button class="btn btn-outline-primary" onclick="inviter_amis('{{ joueur.idJoueur.id }}','{{ Rencontre.idRencontre }}')"><i class="material-icons">add_circle_outline</i></button>
                 </li>
             {% endfor %}
+            {% if not listJoueurAmis %}
+            <li class="list-group-item d-flex justify-content-center">
+                Pas encore d'amis ? Rendez-vous sur la page "Amis" pour rechercher dès maintenant vos futurs coéquipiers !
+            </li>
+            {% endif %}
             </ul>
         </div>
     </div>
