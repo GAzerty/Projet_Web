@@ -3,12 +3,14 @@
 {% block title %}Résumé de la rencontre{% endblock %}
 
 {% block maincontent %}
+    {% if Participe %}
     <div class="d-flex justify-content-center flex-wrap">
         <a href="{% url 'update_rencontre' Rencontre.idRencontre %}" class="btn btn-outline-primary">Modifier la rencontre</a>
         {% if NbJoueurs == 1 %}
         <a href="{% url 'delete_rencontre' Rencontre.idRencontre %}" class="btn btn-outline-danger">Supprimer la rencontre</a>
         {% endif %}
     </div>
+    {% endif %}
     <div>
         <div class="card text-center shadow">
           <div class="card-header">
