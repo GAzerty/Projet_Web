@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from app.forms import SignupJoueurForm, UpdateJoueurForm, CreationRencontreForm, StadeForm, UpdateParticiperForm
 from django.contrib.auth.models import User
@@ -13,8 +15,9 @@ import random
 # ---- VIEWS BASIQUES
 
 def accueil(request):
-    return render(request, 'index.html')
+    return render(request, 'accueil.html')
 
+@login_required
 def logoutJoueur(request):
     logout(request)
     return render(request, 'index.html')
@@ -40,7 +43,7 @@ def signupJoueur(request):
             new_Joueur = Joueur(idJoueur=Utilisateur,quartierJoueur=quartier)
             new_Joueur.save()
             login(request,user)
-            return render(request, 'index.html')
+            return redirect(reverse('account'),permanent=True)
     else:
         form = SignupJoueurForm()
     return render(request, "signup_joueur.html", {'SignupJoueurForm': form})
@@ -49,11 +52,12 @@ def signupJoueur(request):
 #READ - MON COMPTE
 
 #Retourne un Joueur à partir de l'utilisateur connecté
+@login_required
 def getJoueurConnecte(request):
     joueur = Joueur.objects.get(idJoueur=request.user)  # Je récupère le joueur correspondant à l'utilisateur
     return joueur
 
-#@login_required
+@login_required
 def moncompteJoueur(request):
     joueur = getJoueurConnecte(request)
     nbDemande = len(mesDemandes(joueur))
@@ -62,6 +66,7 @@ def moncompteJoueur(request):
 
 
 #UPDATE
+@login_required
 def updateJoueur(request):
     utilisateur = request.user
     joueur = Joueur.objects.get(idJoueur=utilisateur)
@@ -75,7 +80,7 @@ def updateJoueur(request):
             quartier = Quartier.objects.get(nomQuartier=form.cleaned_data['choix_quartier'])
             joueur.quartierJoueur = quartier
             joueur.save() #Sauvegarde du joueur avec ses nouvelles valeurs
-            return moncompteJoueur(request)
+            return redirect(reverse('account'),permanent=True)
     else:
         dataform = {
             'first_name': utilisateur.first_name,
@@ -88,6 +93,7 @@ def updateJoueur(request):
     return render(request, "joueur/update_joueur.html", {'UpdateJoueurForm': form,'Joueur': joueur})
 
 #DELETE
+@login_required
 def deleteJoueur(request):
     getJoueurConnecte(request).delete()
     return render(request, "index.html")
@@ -116,6 +122,7 @@ def mesDemandes(joueur):
     return demande_amis
 
 #View qui affiche une dashboard qui permet plusieurs fonctionnalités (demandeAmis,rechercheAmis,validerDemande,rejeterDemande)
+@login_required
 def dashboardAmis(request):
     joueur = getJoueurConnecte(request)
     listeAmis = mesAmis(joueur)
@@ -127,6 +134,7 @@ def dashboardAmis(request):
 
 #View qui recherche un ami, à partir d'un username
 #Réalisé via AJAX
+@login_required
 def rechercheAmis(request):
     usernameAmis = request.POST.get('rechercheUsername')  #Récupération de l'username du joueur que l'on recherche
     utilisateur = User.objects.filter(username=usernameAmis) #Un username est unique pour chaque joueur
@@ -148,6 +156,7 @@ def rechercheAmis(request):
 #CREATE
 #Creation de Amis, prend en paramètre le username de l'amis à qui l'on envoie la demande
 #Réalisé via AJAX
+@login_required
 def demandeAmis(request):
     usernameAmis = request.POST.get('demandeUsername') #Récupération de l'username
 
@@ -185,6 +194,7 @@ def demandeAmis(request):
 #Accepte la demande en amis
 #Le joueur accepte la demande qui lui a été envoyée
 #Réalisé via AJAX
+@login_required
 def accepteAmis(request):
     idUser_sender = request.POST.get('User')
     utilisateur_sender = User.objects.filter(id=idUser_sender)
@@ -217,6 +227,8 @@ def accepteAmis(request):
 #DELETE
 #Refuser une demande & Annuler une demande
 #Supprime la liaison entre deux joueur.
+#Entre le joueur connecté et le joueur dont l'id est passé via une requête AJAX
+@login_required
 def supprimerAmis(request):
     idUser= request.POST.get('User')
     utilisateur = User.objects.filter(id=idUser)
@@ -242,7 +254,8 @@ def supprimerAmis(request):
     return JsonResponse(reponse)
 
 #READ
-#List
+#LIST
+#READ et LIST du model Amis se retrouvent via la dashboard du model Amis
 
 
 
@@ -253,19 +266,24 @@ def supprimerAmis(request):
 # ---- VIEWS RENCONTRE
 
 #CREATE
+@login_required
 def createRencontre(request):
     title="Organiser un match"
     buttonText="Créer la rencontre"
     if request.method == "POST":
         form = CreationRencontreForm(request.POST)
         if form.is_valid():
-            new_rencontre = form.save(commit=False) #Création d'une rencontre, commit=False empêche la sauvegarde du nouvel objet
+            new_rencontre = Rencontre()
+            new_rencontre.dateRencontre = form.cleaned_data['dateRencontre']
+            new_rencontre.heureRencontre = form.cleaned_data['heureRencontre']
             stade = get_object_or_404(Stade, nomStade=form.cleaned_data['choix_stade'])
             new_rencontre.lieuRencontre = stade
             new_rencontre.save()
             joueur = getJoueurConnecte(request)
             createParticiper(joueur,new_rencontre)  #Le joueur qui a créé la rencontre participe automatiquement à la rencontre
-            return inviterAmis(request,new_rencontre.idRencontre)
+            return redirect(reverse('inviter_mesamis',args=[new_rencontre.idRencontre]),permanent=True)
+            #Redirection vers l'url nommé 'inviter_mesamis'.
+            #On s'assure que le joueur ne pourra pas créer de rencontre en faisant F5 et en renvoyant ainsi la requête de création de la rencontre.
     else:
         form = CreationRencontreForm()
     return render(request, "rencontre/formRencontre.html", {"RencontreForm":form,"title":title,"buttonText":buttonText})
@@ -273,6 +291,7 @@ def createRencontre(request):
 
 
 #READ
+@login_required
 def readRencontre(request,idRencontre):
     rencontre = get_object_or_404(Rencontre, idRencontre=idRencontre)
     participantsLocaux = Participer.objects.filter(idRencontre=rencontre,equipe="LOC")
@@ -292,22 +311,28 @@ def readRencontre(request,idRencontre):
 
 #LIST
 #Retourne la liste des rencontre auquel le joueur participe
+@login_required
 def listRencontre(request):
     joueur = getJoueurConnecte(request)
     listParticiper = Participer.objects.filter(idJoueur=joueur)
-    print(listParticiper)
     listRencontreJoueur = []
     for participation in listParticiper:
         listRencontreJoueur.append(participation.idRencontre)
-    print(listRencontreJoueur)
     return render(request, "rencontre/liste_rencontre.html", {"ListRencontre":listRencontreJoueur,})
 
 
 #UPDATE
+@login_required
 def updateRencontre(request,idRencontre):
     title="Modifier un match"
     buttonText="Modifier la rencontre"
     rencontre = get_object_or_404(Rencontre, idRencontre=idRencontre)
+
+    #On doit vérifier que le joueur participe à la rencontre
+    joueur=getJoueurConnecte(request)
+    if not Participer.objects.filter(idJoueur=joueur,idRencontre=rencontre):
+        raise PermissionDenied #S'il ne participe pas, on génère une exception 403
+
     if request.method == "POST":
         form = CreationRencontreForm(request.POST)
         if form.is_valid():
@@ -316,7 +341,7 @@ def updateRencontre(request,idRencontre):
             rencontre.dateRencontre = form.cleaned_data['dateRencontre']
             rencontre.heureRencontre = form.cleaned_data['heureRencontre']
             rencontre.save()
-            return render(request, "accueil.html")
+            return redirect(reverse('read_rencontre',args=[rencontre.idRencontre]),permanent=True)
     else:
         dataform = {
             "choix_stade":rencontre.lieuRencontre,
@@ -332,6 +357,7 @@ def updateRencontre(request,idRencontre):
 #Vérifications spéciales :
 #       -- Uniquement si le nombre de participant == 1.
 #       -- Uniquement si le joueur participe à la rencontre.
+@login_required
 def deleteRencontre(request,idRencontre):
     rencontre = get_object_or_404(Rencontre, idRencontre=idRencontre)
     joueur = getJoueurConnecte(request)
@@ -344,7 +370,8 @@ def deleteRencontre(request,idRencontre):
     if request.method == "POST":
         rencontre.delete()
         return listRencontre(request)
-    return render(request, "delete.html", {"ObjetDelete":rencontre})
+    message = "la rencontre"
+    return render(request, "delete.html", {"ObjetDelete":message})
 
 
 
@@ -353,6 +380,7 @@ def deleteRencontre(request,idRencontre):
 # ---- VIEWS INVITER
 
 #Retourne une page permettant d'inviter les amis du joueur connecté à la rencontre passé en paramètre
+@login_required
 def inviterAmis(request,idRencontre):
     #Init des valeurs de retour
     succes=True
@@ -374,6 +402,7 @@ def inviterAmis(request,idRencontre):
 
 
 #CREATE
+@login_required
 def createInviter(request):
     idUser= request.POST.get('User') #Récupération de l'id du joueur
     idRencontre = request.POST.get('idRencontre')  # Récupération de l'username
@@ -418,12 +447,14 @@ def createInviter(request):
 
 #LIST
 #Retourne toutes les invitations de la rencontre dont l'id est donné en paramètre
+@login_required
 def listInvitationsRencontre(request,idRencontre):
     rencontre = get_object_or_404(Rencontre, idRencontre=idRencontre)
     invitations = Inviter.objects.filter(idRencontre=rencontre)
     return invitations
 
 #Retourne les invitations du joueur connecté
+@login_required
 def listInvitationsJoueur(request):
     Joueur = getJoueurConnecte(request)
     invitations = Inviter.objects.filter(idJoueur=Joueur)
@@ -435,6 +466,7 @@ def listInvitationsJoueur(request):
 
 
 #VALID
+@login_required
 def acceptInviter(request):
     idRencontre = request.POST.get('idRencontre')  # Récupération de l'username
 
@@ -465,6 +497,7 @@ def acceptInviter(request):
 #Rejeter une invitation reçue
 #Récupère le id du joueurDemandeur et l'id de la rencontre
 #Fait ensuite appel à deleteInviter() en lui précisant le code de suppression
+@login_required
 def rejeterInvitation(request):
     id_joueurDemandeur = request.POST.get('User')  # Récupération de l'id du joueur demandeur
     idRencontre = request.POST.get('idRencontre')  # Récupération de l'idRencontre
@@ -475,6 +508,7 @@ def rejeterInvitation(request):
 #Annuler une invitation envoyé
 #Récupère le id du joueur invité (idJoueur) et l'id de la rencontre
 #Fait ensuite appel à deleteInviter() en lui précisant le code de suppression
+@login_required
 def annulerInvitation(request):
     id_joueurInvite = request.POST.get('User')  # Récupération de l'id du joueur invité
     idRencontre = request.POST.get('idRencontre')  # Récupération de l'idRencontre
@@ -482,6 +516,7 @@ def annulerInvitation(request):
     return deleteInviter(request, id_joueurInvite, idRencontre, codeSuppression)
 
 #DELETE
+@login_required
 def deleteInviter(request,idJoueur,idRencontre,codeSuppression):
     utilisateur_autre = User.objects.filter(id=idJoueur)
     rencontre = Rencontre.objects.filter(idRencontre=idRencontre)
@@ -537,6 +572,7 @@ def createParticiper(joueur,rencontre):
 
 #READ
 #Prend en paramètre l'id de la rencontre dont on souhaite avoir la participation du joueur connecté
+@login_required
 def readParticiper(request,idRencontre):
     rencontre = get_object_or_404(Rencontre, idRencontre=idRencontre) #Récupère la rencontre dont l'id est en paramètre
     joueur = getJoueurConnecte(request) #Récupère le joueur associé à l'utilisateur
@@ -546,11 +582,12 @@ def readParticiper(request,idRencontre):
 
 #UPDATE
 #La seule chose modifiable dans une participation est le nombre de buts marqué et le choix de l'équipe.
+@login_required
 def updateParticiper(request,idRencontre):
     rencontre = get_object_or_404(Rencontre, idRencontre=idRencontre) #Récupère la rencontre dont l'id est en paramètre
     joueur = getJoueurConnecte(request) #Récupère le joueur associé à l'utilisateur
     participer = get_object_or_404(Participer, idJoueur=joueur, idRencontre=rencontre) #Récupère la participation du joueur à la rencontre
-    nbButs_possible = participer.idRencontre.dateRencontre >= date.today()  # Le joueur peut modifier son score uniquement si la date du match est passé ou actuelle
+    nbButs_possible = participer.idRencontre.dateRencontre <= date.today()  # Le joueur peut modifier son score uniquement si la date du match est passé ou actuelle
 
     if request.method == "POST":
         form = UpdateParticiperForm(request.POST)
@@ -558,9 +595,9 @@ def updateParticiper(request,idRencontre):
             if nbButs_possible:
                 participer.nombreButs = form.cleaned_data['nombreButs']
             else:
-                participer.equipe = form.cleaned_data['equipe']
                 participer.nombreButs = 0
-                participer.save()
+            participer.equipe = form.cleaned_data['equipe']
+            participer.save()
             return readRencontre(request,idRencontre)
     else:
         dataform = {
@@ -571,6 +608,7 @@ def updateParticiper(request,idRencontre):
 
 
 #DELETE
+@login_required
 def deleteParticiper(request,idRencontre):
     rencontre = get_object_or_404(Rencontre, idRencontre=idRencontre) #Récupère la rencontre dont l'id est en paramètre
     joueur = getJoueurConnecte(request) #Récupère le joueur associé à l'utilisateur
@@ -579,7 +617,8 @@ def deleteParticiper(request,idRencontre):
         participer.delete()
         return listRencontre(request)
 
-    return render(request, "delete.html", {"ObjetDelete":participer})
+    message = "votre participation"
+    return render(request, "delete.html", {"ObjetDelete":message})
 
 
 
@@ -587,6 +626,7 @@ def deleteParticiper(request,idRencontre):
 # ---- VIEWS STADE
 
 #CREATE
+@login_required
 def createStade(request):
     if request.method == "POST":
         form = StadeForm(request.POST, request.FILES)
@@ -606,6 +646,7 @@ def readStade(request,idStade):
 
 
 #LIST
+#Liste tous les stades du site
 def listStade(request,page=1):
     stades_list = Stade.objects.all()
     paginator = Paginator(stades_list, 3) #Affiche 3 stades par page
@@ -613,6 +654,8 @@ def listStade(request,page=1):
     stades = paginator.get_page(page)
     return render(request, 'stade/list_stade.html', {'stades': stades})
 
+#Liste tous les stades appartenant au quartier du joueur
+@login_required
 def listStadeMonQuartier(request,page=1):
     joueur= getJoueurConnecte(request)
     stades_list = Stade.objects.filter(quartierStade=joueur.quartierJoueur)
@@ -622,6 +665,7 @@ def listStadeMonQuartier(request,page=1):
     return render(request, 'stade/list_stade.html', {'stades': stades})
 
 #UPDATE
+@login_required
 def updateStade(request,idStade):
     stade = get_object_or_404(Stade, idStade=idStade)
     if request.method == "POST":
@@ -652,11 +696,13 @@ def updateStade(request,idStade):
 
 
 #DELETE
+@login_required
 def deleteStade(request,idStade):
     stade = get_object_or_404(Stade, idStade=idStade)
     if request.method == "DELETE":
         stade.delete()
         return listStade(request)
+
     return render(request, "delete.html", {"ObjetDelete":stade})
 
 
