@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from app.models import Joueur, Quartier, Amis, Rencontre, Stade, Inviter, Participer
 from django.http import JsonResponse
 from django.core.paginator import Paginator
+from django.core.exceptions import PermissionDenied
 from datetime import date
 import random
 
@@ -280,10 +281,18 @@ def readRencontre(request,idRencontre):
     rencontre = get_object_or_404(Rencontre, idRencontre=idRencontre)
     participantsLocaux = Participer.objects.filter(idRencontre=rencontre,equipe="LOC")
     participantsVisiteurs = Participer.objects.filter(idRencontre=rencontre, equipe="VIS")
+
+    #Test: L'utilisateur qui read la rencontre doit participer à la rencontre.
+    #On affichera les bouttons de modifications et de suppression uniquement si il participe.
+    joueur = getJoueurConnecte(request)
+    participe = True
+    if not Participer.objects.filter(idJoueur=joueur,idRencontre=rencontre):
+        participe=False
+
     listInvite = Inviter.objects.filter(idRencontre=rencontre)
     nbParticipant = len(participantsLocaux)+len(participantsVisiteurs) #Le nombre de participant. Si il y a 1 participant, le boutton de suppression s'affiche à l'utilisateur.
     heure_match = rencontre.toString_Heure()
-    return render(request, "rencontre/readRencontre.html",{"Rencontre":rencontre,"JoueursLocaux":participantsLocaux,"JoueursVisiteurs":participantsVisiteurs,"JoueursInvite":listInvite,"NbJoueurs":nbParticipant,"HeureMatch":heure_match,})
+    return render(request, "rencontre/readRencontre.html",{"Rencontre":rencontre,"JoueursLocaux":participantsLocaux,"JoueursVisiteurs":participantsVisiteurs,"JoueursInvite":listInvite,"NbJoueurs":nbParticipant,"Participe":participe,"HeureMatch":heure_match,})
 
 #LIST
 #Retourne la liste des rencontre auquel le joueur participe
@@ -306,7 +315,7 @@ def updateRencontre(request,idRencontre):
     if request.method == "POST":
         form = CreationRencontreForm(request.POST)
         if form.is_valid():
-            stade = get_object_or_404(Stade, nomStade=form.cleaned_data['choix_stade'])
+            stade = get_object_or_404(Stade, nomStade=form.cleaned_data['choix_stade']) #On vérifie que le stade existe bien sinon on génère une exception 404
             rencontre.lieuRencontre = stade
             rencontre.dateRencontre = form.cleaned_data['dateRencontre']
             rencontre.heureRencontre = form.cleaned_data['heureRencontre']
@@ -324,12 +333,22 @@ def updateRencontre(request,idRencontre):
         return render(request, "rencontre/formRencontre.html", {"RencontreForm":form,"title":title,"buttonText":buttonText})
 
 #DELETE
+#Suppression d'une rencontre
+#Vérifications spéciales :
+#       -- Uniquement si le nombre de participant == 1.
+#       -- Uniquement si le joueur participe à la rencontre.
 def deleteRencontre(request,idRencontre):
     rencontre = get_object_or_404(Rencontre, idRencontre=idRencontre)
+    joueur = getJoueurConnecte(request)
+
+    #Si l'utilisateur ne participe pas à la rencontre alors on génère une exception 403
+    participe = Participer.objects.filter(idJoueur=joueur,idRencontre=rencontre)
+    if (not participe) or (len(participe)>1):
+        raise PermissionDenied
+
     if request.method == "POST":
         rencontre.delete()
-        #return render(request, "rencontre/liste_rencontre.html") #Retourne la liste des rencontres du joueur connecté
-        return accueil(request)
+        return listRencontre(request)
     return render(request, "delete.html", {"ObjetDelete":rencontre})
 
 
@@ -562,8 +581,7 @@ def deleteParticiper(request,idRencontre):
     rencontre = get_object_or_404(Rencontre, idRencontre=idRencontre) #Récupère la rencontre dont l'id est en paramètre
     joueur = getJoueurConnecte(request) #Récupère le joueur associé à l'utilisateur
     participer = get_object_or_404(Participer, idJoueur=joueur, idRencontre=rencontre) #Récupère la participation du joueur à la rencontre
-
-    if request.method == "DELETE":
+    if request.method == "POST":
         participer.delete()
         return listRencontre(request)
 
