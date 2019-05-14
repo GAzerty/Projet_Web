@@ -15,8 +15,12 @@
                         <a href="{% url 'inviter_mesamis' rencontre.idRencontre %}" class="btn btn-outline-primary">Inviter mes amis</a>
                     </div>
                 </div>
-
             {% endfor %}
+            {% if not ListRencontre %}
+                <div class="list-group-item">
+                    <span>Pas encore de rencontre.. Organisez un match !</span>
+                </div>
+            {% endif %}
 
         </div>
     </div>
