@@ -1,0 +1,17 @@
+{% extends 'index.html' %}
+
+{% block title %}Suppression{% endblock %}
+
+{% block maincontent %}
+    <div class="d-flex justify-content-center">
+        <div class="jumbotron shadow">
+            <h3>Attention ! Êtes-vous sûr de vouloir supprimer {{ ObjetDelete }} ?</h3>
+            <form method="post" action="" >
+                {% csrf_token %}
+                <div class="d-flex justify-content-center">
+                <button class="btn btn-outline-danger" type="submit" >Supprimer</button>
+              </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
