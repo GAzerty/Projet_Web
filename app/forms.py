@@ -19,6 +19,7 @@ class QuartierChoiceField(forms.ModelChoiceField):
 #Formulaire de creation de Joueur
 class SignupJoueurForm(UserCreationForm):
     choix_quartier = QuartierChoiceField(queryset=Quartier.objects.all(), to_field_name='idQuartier', label="Quartier") #Champ de formulaire pour que l'utilisateur choisse sont quartier
+    email = forms.EmailField(required=True) #L'email de l'utilisateur est requis en prévision d'un changement de mot de passe et autre situations
     class Meta(UserCreationForm.Meta):
         model = User
         fields = UserCreationForm.Meta.fields + ('first_name','last_name','email','choix_quartier',) #Les fields de UserCreationForm sont username, password1, password2, etc..
@@ -49,9 +50,9 @@ class CreationRencontreForm(ModelForm):
             'dateRencontre':'Date de la rencontre',
             'heureRencontre':'Heure de la rencontre',
         }
-        """widgets = {
+        widgets = {
             'dateRencontre': forms.SelectDateWidget(years=range(2019, 2020)),
-        }"""
+        }
 
 class UpdateRencontreForm(ModelForm):
     class Meta:
