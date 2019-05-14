@@ -41,11 +41,9 @@ def signupJoueur(request):
             new_Joueur.save()
             login(request,user)
             return render(request, 'index.html')
-        else:
-            return render(request, "signup_joueur.html", {'SignupJoueurForm': form})
     else:
         form = SignupJoueurForm()
-        return render(request, "signup_joueur.html", {'SignupJoueurForm': form})
+    return render(request, "signup_joueur.html", {'SignupJoueurForm': form})
 
 
 #READ - MON COMPTE
@@ -58,7 +56,9 @@ def getJoueurConnecte(request):
 #@login_required
 def moncompteJoueur(request):
     joueur = getJoueurConnecte(request)
-    return render(request, "joueur/account.html", {'Joueur': joueur,}) #Je renvoie le joueur à la template
+    nbDemande = len(mesDemandes(joueur))
+    nbInvitations = len(Inviter.objects.filter(idJoueur=joueur))
+    return render(request, "joueur/account.html", {'Joueur': joueur,"NbDemandes":nbDemande,"NbInvitations":nbInvitations,}) #Je renvoie le joueur à la template
 
 
 #UPDATE
@@ -76,8 +76,6 @@ def updateJoueur(request):
             joueur.quartierJoueur = quartier
             joueur.save() #Sauvegarde du joueur avec ses nouvelles valeurs
             return moncompteJoueur(request)
-        else:
-            return render(request, "joueur/update_joueur.html", {'UpdateJoueurForm': form,'Joueur': joueur})
     else:
         dataform = {
             'first_name': utilisateur.first_name,
@@ -86,12 +84,12 @@ def updateJoueur(request):
             'choix_quartier': joueur.quartierJoueur,
         }
         form = UpdateJoueurForm(dataform) #On lies les données de dataform avec le formulaire, les champs se remplissent en fonctions du nom des champs correspondant au formulaire
-        return render(request, "joueur/update_joueur.html", {'UpdateJoueurForm': form,'Joueur': joueur})
+
+    return render(request, "joueur/update_joueur.html", {'UpdateJoueurForm': form,'Joueur': joueur})
 
 #DELETE
 def deleteJoueur(request):
     getJoueurConnecte(request).delete()
-    #utilisateur = User.objects.get(username=request.user.username).delete()
     return render(request, "index.html")
 
 
@@ -268,11 +266,9 @@ def createRencontre(request):
             joueur = getJoueurConnecte(request)
             createParticiper(joueur,new_rencontre)  #Le joueur qui a créé la rencontre participe automatiquement à la rencontre
             return inviterAmis(request,new_rencontre.idRencontre)
-        else:
-            return render(request, "rencontre/formRencontre.html", {"RencontreForm":form,"title":title,"buttonText":buttonText})
     else:
         form = CreationRencontreForm()
-        return render(request, "rencontre/formRencontre.html", {"RencontreForm":form,"title":title,"buttonText":buttonText})
+    return render(request, "rencontre/formRencontre.html", {"RencontreForm":form,"title":title,"buttonText":buttonText})
 
 
 
@@ -321,8 +317,6 @@ def updateRencontre(request,idRencontre):
             rencontre.heureRencontre = form.cleaned_data['heureRencontre']
             rencontre.save()
             return render(request, "accueil.html")
-        else:
-            return render(request, "rencontre/formRencontre.html", {"RencontreForm":form,"title":title,"buttonText":buttonText})
     else:
         dataform = {
             "choix_stade":rencontre.lieuRencontre,
@@ -330,7 +324,8 @@ def updateRencontre(request,idRencontre):
             "heureRencontre":rencontre.heureRencontre,
         }
         form = CreationRencontreForm(dataform)
-        return render(request, "rencontre/formRencontre.html", {"RencontreForm":form,"title":title,"buttonText":buttonText})
+
+    return render(request, "rencontre/formRencontre.html", {"RencontreForm":form,"title":title,"buttonText":buttonText})
 
 #DELETE
 #Suppression d'une rencontre
@@ -555,7 +550,7 @@ def updateParticiper(request,idRencontre):
     rencontre = get_object_or_404(Rencontre, idRencontre=idRencontre) #Récupère la rencontre dont l'id est en paramètre
     joueur = getJoueurConnecte(request) #Récupère le joueur associé à l'utilisateur
     participer = get_object_or_404(Participer, idJoueur=joueur, idRencontre=rencontre) #Récupère la participation du joueur à la rencontre
-    nbButs_possible = participer.idRencontre.dateRencontre > date.today()  # Le joueur peut modifier son score uniquement si la date du match est passé
+    nbButs_possible = participer.idRencontre.dateRencontre >= date.today()  # Le joueur peut modifier son score uniquement si la date du match est passé ou actuelle
 
     if request.method == "POST":
         form = UpdateParticiperForm(request.POST)
@@ -567,12 +562,11 @@ def updateParticiper(request,idRencontre):
                 participer.nombreButs = 0
                 participer.save()
             return readRencontre(request,idRencontre)
-        else:
-            return render(request, "participer/updateParticiper.html", {"UpdateParticiperForm":form,})
-    dataform = {
-        "equipe":participer.equipe,
-    }
-    form = UpdateParticiperForm(dataform)
+    else:
+        dataform = {
+            "equipe":participer.equipe,
+        }
+        form = UpdateParticiperForm(dataform)
     return render(request, "participer/updateParticiper.html", {"UpdateParticiperForm":form,"Possible":nbButs_possible})
 
 
@@ -599,11 +593,10 @@ def createStade(request):
         if form.is_valid():
             form.save()
             return listStade(request)
-        return render(request, "stade/create_stade.html", {"StadeForm": form})
-
     else:
         form = StadeForm()
-        return render(request, "stade/create_stade.html", {"StadeForm":form})
+
+    return render(request, "stade/create_stade.html", {"StadeForm":form})
 
 
 #READ
@@ -615,6 +608,14 @@ def readStade(request,idStade):
 #LIST
 def listStade(request,page=1):
     stades_list = Stade.objects.all()
+    paginator = Paginator(stades_list, 3) #Affiche 3 stades par page
+
+    stades = paginator.get_page(page)
+    return render(request, 'stade/list_stade.html', {'stades': stades})
+
+def listStadeMonQuartier(request,page=1):
+    joueur= getJoueurConnecte(request)
+    stades_list = Stade.objects.filter(quartierStade=joueur.quartierJoueur)
     paginator = Paginator(stades_list, 3) #Affiche 3 stades par page
 
     stades = paginator.get_page(page)
@@ -635,7 +636,6 @@ def updateStade(request,idStade):
             stade.imageStade = form.cleaned_data['imageStade']
             stade.save()
             return readStade(request,stade.idStade)
-        return render(request, "stade/create_stade.html", {"StadeForm": form})
 
     else:
         formdata = {
@@ -648,7 +648,7 @@ def updateStade(request,idStade):
             "imageStade": stade.imageStade.url,
         }
         form = StadeForm(formdata)
-        return render(request, "stade/create_stade.html", {"StadeForm":form})
+    return render(request, "stade/create_stade.html", {"StadeForm":form})
 
 
 #DELETE
