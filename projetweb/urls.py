@@ -24,7 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.accueil, name='accueil'),
     path('signup/', views.signupJoueur, name='signup'),
-    path('signin/', auth_views.LoginView.as_view(template_name='signin_joueur.html',redirect_field_name='accueil'), name='signin'),
+    path('signin/', auth_views.LoginView.as_view(template_name='signin_joueur.html',redirect_field_name='account'), name='signin'),
     path('logout/', views.logoutJoueur, name='logout'),
     path('account/', views.moncompteJoueur, name='account'),
     path('account/update', views.updateJoueur, name='update_joueur'),
