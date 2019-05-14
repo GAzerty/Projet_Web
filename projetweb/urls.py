@@ -53,4 +53,6 @@ urlpatterns = [
     path('stade/delete/<int:idStade>', views.deleteStade, name='delete_stade'),
     path('stade/list/', views.listStade, name='list_stade'),
     path('stade/list/<int:page>', views.listStade, name='list_stade'),
+    path('stade/list/monquartier', views.listStadeMonQuartier, name='list_myquartier_stade'),
+    path('stade/list/monquartier/<int:page>', views.listStadeMonQuartier, name='list_myquartier_stade'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
