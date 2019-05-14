@@ -17,10 +17,20 @@
                         Email: {{ Joueur.idJoueur.email }}
                     </li>
                     <li class="list-group-item">
-                        Demandes d'amis: 0
+                        Demandes d'amis :
+                        {% if NbDemandes > 0 %}
+                            <a href="{% url 'dashboard_amis' %}" ><span class="badge badge-primary">{{ NbDemande }}</span></a>
+                        {% else %}
+                            Aucune
+                        {% endif %}
                     </li>
                     <li class="list-group-item">
-                        Invitations à un match: 1
+                        Invitations à un match:
+                        {% if NbInvitations > 0 %}
+                            <a href="{% url 'list_invitations_joueur' %}" ><span class="badge badge-primary">{{ NbInvitations }}</span></a>
+                        {% else %}
+                            Aucune
+                        {% endif %}
                     </li>
                 </ul>
             </div>
