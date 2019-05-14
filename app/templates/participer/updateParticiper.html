@@ -8,7 +8,7 @@
         <div class="custom-formulaire shadow">
           <form class="m-2" method="post" action="">
           {% csrf_token %}
-              {% if possible %}
+              {% if Possible %}
                   {% for error in UpdateParticiperForm.nombreButs.errors %}
                   <div class="form-error">
                     <p>{{ error }}</p>
