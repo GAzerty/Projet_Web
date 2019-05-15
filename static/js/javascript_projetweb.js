@@ -3,12 +3,14 @@ var data;
 var reponse;
 var method;
 
+//Fonction de traitement, après que la requête Ajax
+
 function demande_amis_traitement(reponse){
     var feeback_html = document.getElementById("feedback_demande_ami");
     feeback_html.innerHTML = reponse.feedback;
 }
 
-//Résoudre le problème de value avec input
+
 function recherche_amis_traitement(reponse){
     var feeback_html = document.getElementById("feedback_recherche_ami");
     feeback_html.innerHTML = reponse.feedback;
@@ -40,12 +42,13 @@ function reponse_invit_traitement(reponse){
     feeback_html.innerHTML = reponse.feedback;
 }
 
+
+//Fonction qui réalise une requête Ajax
+//Prend en paramètre la methode, l'url, les données et la fonction à appeler.
 function requeteAjax(method,url,data,fonction_succes){
     var xhttp = new XMLHttpRequest();
     xhttp.open(method, url, true);
     xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-
-    console.log(data)
     xhttp.send(data);
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) { //readystate=4 : requête terminé, status=200 : Ok
@@ -103,7 +106,7 @@ document.getElementById("btn_rechercheUsername").onclick = recherche_amis_click;
 
 function inviter_amis(idUser,idrencontre){
     method = "POST";
-    url = "/rencontre/inviter/";
+    url = "/game/invitation/new/";
     var inputs = document.getElementsByTagName("input");
     var csrf = "csrfmiddlewaretoken="+inputs.csrfmiddlewaretoken.value;
     id_send = "User="+idUser;
@@ -114,7 +117,7 @@ function inviter_amis(idUser,idrencontre){
 
 function accepter_invit(idrencontre){
     method = "POST";
-    url = "/rencontre/invitation/accept";
+    url = "/game/invitation/accept/";
     var inputs = document.getElementsByTagName("input");
     var csrf = "csrfmiddlewaretoken="+inputs.csrfmiddlewaretoken.value;
     idrencontre_send = "idRencontre="+idrencontre;
@@ -125,7 +128,7 @@ function accepter_invit(idrencontre){
 //A TESTER
 function rejeter_invit(idJoueur,idrencontre){
     method = "POST"
-    url = "/rencontre/invitation/rejeter";
+    url = "/game/invitation/reject/";
     var inputs = document.getElementsByTagName("input");
     var csrf = "csrfmiddlewaretoken="+inputs.csrfmiddlewaretoken.value;
     id_send = "User="+idJoueur;
@@ -137,7 +140,7 @@ function rejeter_invit(idJoueur,idrencontre){
 //A TESTER
 function annuler_invit(idJoueur,idrencontre){
     method = "POST"
-    url = "/rencontre/invitation/annuler";
+    url = "/game/invitation/cancel/";
     var inputs = document.getElementsByTagName("input");
     var csrf = "csrfmiddlewaretoken="+inputs.csrfmiddlewaretoken.value;
     id_send = "User="+idJoueur;
@@ -145,5 +148,3 @@ function annuler_invit(idJoueur,idrencontre){
     data = csrf+"&"+id_send+"&"+idrencontre_send;
     reponse = requeteAjax(method,url,data,reponse_invit_traitement);
 }
-
-//accepter_invit et rejeter_invit ont certainement les mêmes fonctions de traitement - A FAIRE
