@@ -7,7 +7,7 @@
 
 <div class="d-flex justify-content-center">
         <div class="custom-formulaire shadow">
-          <form class="m-2" method="post" action="">
+          <form class="m-2" method="post" action="{% url 'signin' %}">
           {% csrf_token %}
               {% for field in form %}
                   {% for error in field.errors %}

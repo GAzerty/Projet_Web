@@ -6,7 +6,7 @@
 {% block maincontent %}
     <div class="d-flex justify-content-center">
         <div class="custom-formulaire shadow">
-          <form class="m-2" method="post" action="">
+          <form class="m-2" method="post" action="{% url 'signup' %}">
           {% csrf_token %}
               {% for field in SignupJoueurForm %}
                   {% for error in field.errors %}

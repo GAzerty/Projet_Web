@@ -6,7 +6,7 @@
 {% block maincontent %}
     <div class="d-flex justify-content-center">
         <div class="custom-formulaire shadow">
-          <form class="m-2" method="post" action="">
+          <form class="m-2" method="post" action="{% url 'update_participer' Rencontre.idRencontre %}">
           {% csrf_token %}
               {% if Possible %}
                   {% for error in UpdateParticiperForm.nombreButs.errors %}
