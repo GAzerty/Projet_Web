@@ -286,7 +286,7 @@ def createRencontre(request):
             #On s'assure que le joueur ne pourra pas créer de rencontre en faisant F5 et en renvoyant ainsi la requête de création de la rencontre.
     else:
         form = CreationRencontreForm()
-    return render(request, "rencontre/formRencontre.html", {"RencontreForm":form,"title":title,"buttonText":buttonText})
+    return render(request, "rencontre/formRencontre.html", {"RencontreForm":form,"title":title,"buttonText":buttonText,})
 
 
 
@@ -350,7 +350,7 @@ def updateRencontre(request,idRencontre):
         }
         form = CreationRencontreForm(dataform)
 
-    return render(request, "rencontre/formRencontre.html", {"RencontreForm":form,"title":title,"buttonText":buttonText})
+    return render(request, "rencontre/formRencontre.html", {"RencontreForm":form,"title":title,"buttonText":buttonText,})
 
 #DELETE
 #Suppression d'une rencontre
@@ -389,16 +389,15 @@ def inviterAmis(request,idRencontre):
     joueur = getJoueurConnecte(request)
     listAmis = mesAmis(joueur) #Récupère les amis du joueur connecté
     listJoueurAmis =[]
-    print(listAmis)
     for ami in listAmis:
         listJoueurAmis.append(ami.monAmi(joueur)) #Je récupère les joueur ami avec le joueur passé en paramètre
-    print(listJoueurAmis)
     rencontre = get_object_or_404(Rencontre, idRencontre=idRencontre)
     participation = Participer.objects.filter(idJoueur=joueur, idRencontre=rencontre)
     if not participation:
         succes=False
         feedback="Vous ne participez pas à cette rencontre. Vous n'avez pas la possibilité d'ajouter vos amis."
-    return render(request , "inviter/amis_inviter.html", {"listJoueurAmis":listJoueurAmis,"Rencontre":rencontre,"succes":succes,"feedback":feedback})
+    heureRencontre = rencontre.toString_Heure()
+    return render(request , "inviter/amis_inviter.html", {"listJoueurAmis":listJoueurAmis,"Rencontre":rencontre,"succes":succes,"feedback":feedback,"HeureRencontre":heureRencontre})
 
 
 #CREATE
@@ -592,10 +591,10 @@ def updateParticiper(request,idRencontre):
     if request.method == "POST":
         form = UpdateParticiperForm(request.POST)
         if form.is_valid():
-            if nbButs_possible:
-                participer.nombreButs = form.cleaned_data['nombreButs']
-            else:
+            if nbButs_possible and form.cleaned_data['nombreButs']==None:
                 participer.nombreButs = 0
+            else:
+                participer.nombreButs = form.cleaned_data['nombreButs']
             participer.equipe = form.cleaned_data['equipe']
             participer.save()
             return readRencontre(request,idRencontre)
@@ -604,7 +603,7 @@ def updateParticiper(request,idRencontre):
             "equipe":participer.equipe,
         }
         form = UpdateParticiperForm(dataform)
-    return render(request, "participer/updateParticiper.html", {"UpdateParticiperForm":form,"Possible":nbButs_possible})
+    return render(request, "participer/updateParticiper.html", {"UpdateParticiperForm":form,"Possible":nbButs_possible,"Rencontre":rencontre})
 
 
 #DELETE
