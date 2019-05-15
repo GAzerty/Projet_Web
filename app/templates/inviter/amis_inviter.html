@@ -8,7 +8,7 @@
         <div class="card shadow">
             <div class="card-header">
             <h5>Inviter mes amis au match</h5>
-            <span>Rencontre du {{ Rencontre.dateRencontre }} à {{ Rencontre.heureRencontre }} : {{ Rencontre.lieuRencontre }}.</span>
+            <span>Rencontre du {{ Rencontre.dateRencontre }} à {{ HeureRencontre }} : <a href="{% url 'read_stade' Rencontre.lieuRencontre.idStade %}">{{ Rencontre.lieuRencontre }}</a>.</span>
             </div>
             <div id="feedback"></div>
             <ul class="list-group list-group-flush">
