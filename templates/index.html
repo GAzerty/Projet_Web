@@ -21,7 +21,7 @@
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#menuResponsive" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
         <span><i class="material-icons">menu</i></span>
       </button>
-      <a class="navbar-brand" href="{% url 'accueil' %}"><img src="https://img.icons8.com/ios/50/000000/football.png">PROJETWEB</a>
+      <a class="navbar-brand" href="{% url 'accueil' %}"><img src="https://img.icons8.com/ios/50/000000/football.png">FootEntreAmis</a>
 
       <div class="collapse navbar-collapse" id="menuResponsive">
         <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
@@ -45,7 +45,9 @@
             <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Stades</a>
             <div class="dropdown-menu">
               <a class="dropdown-item" href="{% url 'list_stade'%}">Tous les stades</a>
-              <a class="dropdown-item" href="{% url 'list_myquartier_stade' %}">Stades dans mon quartier</a>
+              {% if user.is_authenticated %}
+                <a class="dropdown-item" href="{% url 'list_myquartier_stade' %}">Stades dans mon quartier</a>
+              {% endif %}
               <a class="dropdown-item" href="#">Voir la carte des stades</a>
             </div>
           </li>
@@ -66,39 +68,7 @@
 
     <div class="container mt-5">
     {% block maincontent %}
-
-        <div class="row">
-            <div class="col">
-              {% if not user.is_authenticated %}
-              <div class="card-deck">
-                <div class="card text-center">
-                  <div class="card-header">
-                    Bienvenue sur FootEntreAmis
-                  </div>
-                  <div class="card-body">
-                    <h5 class="card-title">Alors ? Pas encore inscrit !</h5>
-                    <p class="card-text">Inscrit toi dès maintenant et organise des matchs de foot avec tes amis dans les différents stades de la ville.</p>
-                  </div>
-                  <div class="card-footer">
-                    <a class="btn btn-outline-success my-2 my-sm-0" href="{% url 'signup' %}">S'inscrire</a>
-                    <a class="btn btn-outline-primary my-2 my-sm-0" href="{% url 'signin' %}">Connexion</a>
-                  </div>
-                </div>
-                <div class="card text-center">
-                  <div class="card-header">
-                    Je suis de passage
-                  </div>
-                  <div class="card-body">
-                    <h5 class="card-title">Je souhaite consulter les stades à Montpellier</h5>
-                    <p class="card-text">Notre carte répertorie tout les stades de la ville de Montpellier. Même pas besoin de se connecter pour ça !</p>
-                    <a href="#" class="btn btn-primary">Voir la carte des stades</a>
-                  </div>
-                </div>
-
-              </div>
-              {% endif %}
-            </div>
-        </div>
+      
 
     {% endblock %}
     </div>
