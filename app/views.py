@@ -20,7 +20,7 @@ def accueil(request):
 @login_required
 def logoutJoueur(request):
     logout(request)
-    return render(request, 'index.html')
+    return render(request, 'accueil.html')
 
 #change psswd()
 
@@ -238,7 +238,7 @@ def supprimerAmis(request):
     else:
         joueur1 = Joueur.objects.get(idJoueur=utilisateur[0])
         joueur2 = getJoueurConnecte(request)
-        relation_amis = Amis.objects.filter(Q(Q(joueur1Amis=joueur1) & Q(joueur2Amis=joueur2)) | Q(Q(joueur1Amis=joueur2) & Q(joueur2Amis=joueur2))) # Un seul résultat possible a cette requête
+        relation_amis = Amis.objects.filter(Q(joueur1Amis=joueur1,joueur2Amis=joueur2) | Q(joueur1Amis=joueur2,joueur2Amis=joueur2)) # Un seul résultat possible a cette requête
         if not relation_amis:
             succes = False
             feedback = "Aucune amitié existante."
