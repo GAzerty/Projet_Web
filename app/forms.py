@@ -43,12 +43,12 @@ class StadeChoiceField(forms.ModelChoiceField):
 
 class CreationRencontreForm(ModelForm):
     choix_stade = StadeChoiceField(queryset=Stade.objects.all(), to_field_name="idStade", label="Stade",widget=forms.Select(attrs={'class': 'form-control'}))
+    heureMatch = forms.TimeField(label="Heure de la rencontre",help_text="Format 'H':'M'")
     class Meta:
         model = Rencontre
-        fields = ['dateRencontre','heureRencontre']
+        fields = ['dateRencontre',]
         labels = {
             'dateRencontre':'Date de la rencontre',
-            'heureRencontre':'Heure de la rencontre',
         }
         widgets = {
             'dateRencontre': forms.SelectDateWidget(years=range(2019, 2020)),
