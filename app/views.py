@@ -9,7 +9,7 @@ from app.models import Joueur, Quartier, Amis, Rencontre, Stade, Inviter, Partic
 from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.core.exceptions import PermissionDenied
-from datetime import date
+from datetime import date, time
 import random
 
 # ---- VIEWS BASIQUES
@@ -275,7 +275,8 @@ def createRencontre(request):
         if form.is_valid():
             new_rencontre = Rencontre()
             new_rencontre.dateRencontre = form.cleaned_data['dateRencontre']
-            new_rencontre.heureRencontre = form.cleaned_data['heureRencontre']
+            timeRencontre  = form.cleaned_data['heureMatch'] #On retrouve un attribut de type datetime.time
+            new_rencontre.heureRencontre = timeRencontre.hour*100 + timeRencontre.minute #12:30 -> 1200 +30 = 1230
             stade = get_object_or_404(Stade, nomStade=form.cleaned_data['choix_stade'])
             new_rencontre.lieuRencontre = stade
             new_rencontre.save()
@@ -343,10 +344,13 @@ def updateRencontre(request,idRencontre):
             rencontre.save()
             return redirect(reverse('read_rencontre',args=[rencontre.idRencontre]),permanent=True)
     else:
+        heure = int(str(rencontre.heureRencontre)[0:2])
+        minute = int(str(rencontre.heureRencontre)[2:4])
+        heureRencontre = time(heure,minute)
         dataform = {
             "choix_stade":rencontre.lieuRencontre,
             "dateRencontre":rencontre.dateRencontre,
-            "heureRencontre":rencontre.heureRencontre,
+            "heureMatch":heureRencontre,
         }
         form = CreationRencontreForm(dataform)
 
