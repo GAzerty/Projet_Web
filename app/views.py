@@ -325,13 +325,17 @@ def readRencontre(request,idRencontre):
 #LIST
 #Retourne la liste des rencontre auquel le joueur participe
 @login_required
-def listRencontre(request):
+def listRencontre(request,page=1):
     joueur = getJoueurConnecte(request)
     listParticiper = Participer.objects.filter(idJoueur=joueur)
     listRencontreJoueur = []
     for participation in listParticiper:
         listRencontreJoueur.append(participation.idRencontre)
-    return render(request, "rencontre/liste_rencontre.html", {"ListRencontre":listRencontreJoueur,})
+
+    paginator = Paginator(listRencontreJoueur, 5) #Affiche 5 rencontre par page
+    listRencontre = paginator.get_page(page)
+
+    return render(request, "rencontre/liste_rencontre.html", {"ListRencontre":listRencontre,})
 
 
 #UPDATE
