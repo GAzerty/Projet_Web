@@ -29,6 +29,7 @@ urlpatterns = [
     path('account/', views.moncompteJoueur, name='account'),
     path('account/update', views.updateJoueur, name='update_joueur'),
     path('account/change-password/',auth_views.PasswordChangeView.as_view(template_name='change_password.html', success_url='/account/'), name="change_passwd"),
+    path('account/delete/', views.deleteJoueur, name='delete_joueur'),
     path('friend/dashboard/', views.dashboardAmis, name='dashboard_amis'),
     path('friend/sendto/', views.demandeAmis, name='create_amis'),
     path('friend/search/', views.rechercheAmis, name='search_amis'),
