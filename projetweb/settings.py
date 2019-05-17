@@ -90,7 +90,7 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
-
+#Permet de définir ce qui consituera la vérification du password saisit par l'utilisateur
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -121,25 +121,28 @@ USE_L10N = True
 USE_TZ = True
 
 
-#SESSION
+# SESSION
 
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies" #Les sessions sont gérés avec les cookies en définissant la variable SESSION_ENGINE ainsi
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True #La session expire à la fermeture du navigateur
 
+#SESSION_COOKIE_SECURE = True #Cookie marqué comme sécurisé, envoyé uniquement pour des connexions HTTPS
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') #Répertoire cible où collectstatic rassemble les fichiers en production
+STATIC_URL = '/static/'                             #Url cible pour les fichiers statique
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage' #Moteur de stockage pour collectstatic, utilisation de whitenoise
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+MEDIA_URL = '/media/'                           #Url cible pour les fichiers uploadé
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')   #Répertoire cible pour les fichiers uploadé
+
 
 LOGIN_URL = 'signin' #Redirection vers la connexion de l'utilisateur
 LOGIN_REDIRECT_URL = 'account' #Redirection après la connexion de l'utilisateur
