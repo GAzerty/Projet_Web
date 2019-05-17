@@ -28,23 +28,23 @@
             <h5 class="card-title">Rechercher un ami</h5>
             <p class="card-text">Tapez le nom d'utilisateur de votre ami et lancez une recherche.</p>
             <div id="feedback_recherche_ami"></div>
-            <form>
+            <div>
                 <input class="form-control mr-sm-2" type="search" placeholder="Nom d'utilisateur" name="rechercheUsername" id="id_rechercheUsername">
                 <div class="d-flex justify-content-center m-2">
-                    <a id="btn_rechercheUsername"  class="btn btn-outline-success" >Rechercher</a>
+                    <button onclick="recherche_amis()" id="btn_rechercheUsername"  class="btn btn-outline-success" >Rechercher</button>
                 </div>
-            </form>
+            </div>
           </div>
           <div class="card-body">
             <h5 class="card-title">Faire une demande d'ami</h5>
             <p class="card-text">Tapez le nom d'utilisateur et envoyez votre demande.</p>
             <div id="feedback_demande_ami"></div>
-            <form>
+            <div>
                 <input class="form-control mr-sm-2" type="search" placeholder="Nom d'utilisateur" name="demandeUsername" id="id_demandeUsername">
                 <div class="d-flex justify-content-center m-2">
-                    <a id="btn_demande_usernameAmis" class="btn btn-outline-success" >Envoyer</a>
+                    <button onclick="demande_amis()" id="btn_demande_usernameAmis" class="btn btn-outline-success" >Envoyer</button>
                 </div>
-            </form>
+            </div>
           </div>
         </div>
 
