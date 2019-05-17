@@ -1,9 +1,15 @@
 {% extends 'index.html' %}
-{% load widget_tweaks %}
 
 {% block title %}Liste des stades{% endblock %}
 
 {% block maincontent %}
+    <div>
+        <div>
+            {% for quartier in ListQuartiers %}
+                <a href="{% url 'list_byquartier_stade' quartier.idQuartier %}">{{ quartier }}</a>
+            {% endfor %}
+        </div>
+    </div>
     <div>
         <div class="card-columns">
             {% for stade in stades %}
