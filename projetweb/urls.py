@@ -40,6 +40,7 @@ urlpatterns = [
     path('game/update/<int:idRencontre>', views.updateRencontre, name='update_rencontre'),
     path('game/delete/<int:idRencontre>', views.deleteRencontre, name='delete_rencontre'),
     path('game/list/', views.listRencontre, name='list_rencontre'),
+    path('game/list/<int:page>', views.listRencontre, name='list_rencontre'),
     path('game/<int:idRencontre>/invitemyfriends/', views.inviterAmis, name='inviter_mesamis'),
     path('game/invitation/new/', views.createInviter, name='create_inviter'),
     path('game/invitation/list/', views.listInvitationsJoueur, name='list_invitations_joueur'),
