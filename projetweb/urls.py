@@ -54,4 +54,6 @@ urlpatterns = [
     path('stadium/list/<int:page>', views.listStade, name='list_stade'),
     path('stadium/list/myneighborhood/', views.listStadeMonQuartier, name='list_myquartier_stade'),
     path('stadium/list/myneighborhood/<int:page>', views.listStadeMonQuartier, name='list_myquartier_stade'),
+    path('stadium/list/byneighborhood/<int:idQuartier>', views.listStadeParQuartier, name='list_byquartier_stade'),
+    path('stadium/list/byneighborhood/<int:idQuartier>/<int:page>', views.listStadeParQuartier, name='list_byquartier_stade'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

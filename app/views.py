@@ -665,9 +665,9 @@ def readStade(request,idStade):
 def listStade(request,page=1):
     stades_list = Stade.objects.all()
     paginator = Paginator(stades_list, 3) #Affiche 3 stades par page
-
+    quartier = Quartier.objects.all().order_by('nomQuartier')
     stades = paginator.get_page(page)
-    return render(request, 'stade/list_stade.html', {'stades': stades})
+    return render(request, 'stade/list_stade.html', {'stades': stades,"ListQuartiers":quartier})
 
 #Liste tous les stades appartenant au quartier du joueur
 @login_required
@@ -675,9 +675,21 @@ def listStadeMonQuartier(request,page=1):
     joueur= getJoueurConnecte(request)
     stades_list = Stade.objects.filter(quartierStade=joueur.quartierJoueur)
     paginator = Paginator(stades_list, 3) #Affiche 3 stades par page
+    quartier = Quartier.objects.all().order_by('nomQuartier')
 
     stades = paginator.get_page(page)
-    return render(request, 'stade/list_stade.html', {'stades': stades})
+    return render(request, 'stade/list_stade.html', {'stades': stades,"ListQuartiers":quartier})
+
+#Liste tous les stades appartenant au quartier en paramètre
+@login_required
+def listStadeParQuartier(request,idQuartier,page=1):
+    choixQuartier = get_object_or_404(Quartier, idQuartier=idQuartier)
+    stades_list = Stade.objects.filter(quartierStade=choixQuartier)
+    paginator = Paginator(stades_list, 3) #Affiche 3 stades par page
+    quartier = Quartier.objects.all().order_by('nomQuartier')
+    stades = paginator.get_page(page)
+    return render(request, 'stade/list_stade_quartier.html', {'stades': stades,"ListQuartiers":quartier,'ChoixQuartier':choixQuartier})
+
 
 #UPDATE
 @login_required
