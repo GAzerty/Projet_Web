@@ -1,0 +1,48 @@
+{% extends 'index.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Liste des stades{% endblock %}
+
+{% block maincontent %}
+    <div>
+        <div>
+            {% for quartier in ListQuartiers %}
+                <a href="{% url 'list_byquartier_stade' quartier.idQuartier %}">{{ quartier }}</a>
+            {% endfor %}
+        </div>
+    </div>
+    <h3>Tous les stades du quartier {{ ChoixQuartier.nomQuartier }} :</h3>
+    <div>
+        <div class="card-columns">
+            {% for stade in stades %}
+                <div class="card">
+                    <img src="{{ stade.imageStade.url }}" class="card-img-top image-stade"  alt="Image {{ stade }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ stade }}</h5>
+                        <span>Quartier : {{stade.quartierStade.nomQuartier}} </span>
+                        <div class="d-flex justify-content-center">
+                            <a href="{% url 'read_stade' stade.idStade %}" class="btn btn-outline-primary">Voir le stade</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            {% if not stades %}
+                <span>Aucun stade dans ce quartier</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <nav class="nav_pagination d-flex justify-content-center mt-5">
+      <ul class="pagination">
+          {% if stades.has_previous %}
+            <li class="page-item"><a class="page-link" href="{% url 'list_byquartier_stade' ChoixQuartier.idQuartier stades.previous_page_number %}"> {{ stades.previous_page_number }} </a></li>
+          {% endif %}
+            <li class="page-item active"><a class="page-link" href="#">{{ stades.number }}</a></li>
+          {% if stades.has_next %}
+            <li class="page-item"><a class="page-link" href="{% url 'list_byquartier_stade' ChoixQuartier.idQuartier stades.next_page_number %}"> {{ stades.next_page_number}} </a></li>
+          {% endif %}
+      </ul>
+    </nav>
+{% endblock %}
+
+
