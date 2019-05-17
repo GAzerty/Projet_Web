@@ -127,7 +127,7 @@ SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies" #Les sessions
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True #La session expire à la fermeture du navigateur
 
-#SESSION_COOKIE_SECURE = True #Cookie marqué comme sécurisé, envoyé uniquement pour des connexions HTTPS
+SESSION_COOKIE_SECURE = True #Cookie marqué comme sécurisé, envoyé uniquement pour des connexions HTTPS
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
