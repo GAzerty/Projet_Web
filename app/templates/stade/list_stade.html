@@ -3,10 +3,10 @@
 {% block title %}Liste des stades{% endblock %}
 
 {% block maincontent %}
-    <div>
-        <div>
+    <div class="d-flex justify-content-center">
+        <div class="list-group list-group-horizontal-sm mb-5 shadow">
             {% for quartier in ListQuartiers %}
-                <a href="{% url 'list_byquartier_stade' quartier.idQuartier %}">{{ quartier }}</a>
+                <a class="list-group-item list-group-item-action" href="{% url 'list_byquartier_stade' quartier.idQuartier %}">{{ quartier }}</a>
             {% endfor %}
         </div>
     </div>
