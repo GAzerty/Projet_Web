@@ -95,8 +95,13 @@ def updateJoueur(request):
 #DELETE
 @login_required
 def deleteJoueur(request):
-    getJoueurConnecte(request).delete()
-    return render(request, "index.html")
+    if request.method == "POST":
+        utilisateur = request.user
+        utilisateur.delete()
+        logout(request)
+        return redirect(reverse('logout'))
+    message = "votre compte (irréversible)."
+    return render(request, "delete.html", {"ObjetDelete":message})
 
 
 
@@ -169,7 +174,7 @@ def demandeAmis(request):
         joueur_recipient = Joueur.objects.get(idJoueur=utilisateur_recipient[0])
 
         #Testons si une amitié existe déjà entre ces deux joueurs:
-        intergrity_amis = Amis.objects.filter(Q(Q(joueur1Amis=joueur_sender) & Q(joueur2Amis=joueur_recipient)) | Q(Q(joueur1Amis=joueur_recipient) & Q(joueur2Amis=joueur_sender)))
+        intergrity_amis = Amis.objects.filter(joueur1Amis=joueur_sender, joueur2Amis=joueur_recipient).union(Amis.objects.filter(joueur1Amis=joueur_recipient,joueur2Amis=joueur_sender))
 
         if joueur_recipient.idJoueur==joueur_sender.idJoueur: #Un joueur ne peut pas s'ajouter en ami lui-même
             succes=False
@@ -238,12 +243,19 @@ def supprimerAmis(request):
     else:
         joueur1 = Joueur.objects.get(idJoueur=utilisateur[0])
         joueur2 = getJoueurConnecte(request)
-        relation_amis = Amis.objects.filter(Q(joueur1Amis=joueur1,joueur2Amis=joueur2) | Q(joueur1Amis=joueur2,joueur2Amis=joueur2)) # Un seul résultat possible a cette requête
-        if not relation_amis:
+
+        ListAmis = mesAmis(joueur2) #On récupère tous les amis du joueur connecté
+        relation_amis = False
+        for ami in ListAmis: #Parcour de la liste pour rechercher le joueur en paramètre et vérifier que l'amitié existe bien
+            if (joueur1.idJoueur == ami.joueur1Amis.idJoueur) or (joueur1.idJoueur == ami.joueur2Amis.idJoueur):
+                relation_amis=True
+                amitie=ami
+
+        if not relation_amis: #Si on ne retrouve pas le joueur en paramètre parmis les amitié du joueur connecté
             succes = False
             feedback = "Aucune amitié existante."
         else:
-            relation_amis[0].delete()
+            amitie.delete()
             succes = False
             feedback = "Amitié supprimé."
 
