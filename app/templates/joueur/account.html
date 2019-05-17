@@ -36,7 +36,8 @@
             </div>
             <div class="btn-group-vertical d-flex justify-content-center">
               <a href="{% url 'update_joueur' %}" class="btn btn-outline-primary"><i class="material-icons">create</i>Modifier mes informations</a>
-              <a href="#" class="btn btn-outline-danger"><i class="material-icons">delete_forever</i>Supprimer mon compte</a>
+              <a href="{% url 'change_passwd' %}" class="btn btn-outline-dark"><i class="material-icons">redo</i>Changer le mot de passe</a>
+              <a href="{% url 'delete_joueur' %}" class="btn btn-outline-danger"><i class="material-icons">delete_forever</i>Supprimer mon compte</a>
             </div>
           </div>
         </div>
