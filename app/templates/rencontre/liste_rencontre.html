@@ -4,6 +4,7 @@
 
 {% block maincontent %}
     <div class="d-flex justify-content-center flex-wrap">
+
         <div class="list-group">
             {% for rencontre in ListRencontre %}
                 <div class="list-group-item">
@@ -24,4 +25,15 @@
 
         </div>
     </div>
+    <nav class="nav_pagination d-flex justify-content-center mt-5">
+      <ul class="pagination">
+          {% if ListRencontre.has_previous %}
+            <li class="page-item"><a class="page-link" href="{% url 'list_rencontre' ListRencontre.previous_page_number %}"> {{ ListRencontre.previous_page_number }} </a></li>
+          {% endif %}
+            <li class="page-item active"><a class="page-link" href="#">{{ ListRencontre.number }}</a></li>
+          {% if ListRencontre.has_next %}
+            <li class="page-item"><a class="page-link" href="{% url 'list_rencontre' ListRencontre.next_page_number %}"> {{ ListRencontre.next_page_number}} </a></li>
+          {% endif %}
+      </ul>
+    </nav>
 {% endblock %}
