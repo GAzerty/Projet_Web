@@ -607,10 +607,11 @@ def updateParticiper(request,idRencontre):
     if request.method == "POST":
         form = UpdateParticiperForm(request.POST)
         if form.is_valid():
-            if nbButs_possible and form.cleaned_data['nombreButs']==None:
+            if form.cleaned_data['nombreButs']==None:
                 participer.nombreButs = 0
             else:
                 participer.nombreButs = form.cleaned_data['nombreButs']
+            print(participer.nombreButs)
             participer.equipe = form.cleaned_data['equipe']
             participer.save()
             return readRencontre(request,idRencontre)
@@ -629,7 +630,13 @@ def deleteParticiper(request,idRencontre):
     joueur = getJoueurConnecte(request) #Récupère le joueur associé à l'utilisateur
     participer = get_object_or_404(Participer, idJoueur=joueur, idRencontre=rencontre) #Récupère la participation du joueur à la rencontre
     if request.method == "POST":
-        participer.delete()
+        participer.delete() #Suppression de la participation
+
+        #Il faut vérifier si la rencontre concerné possède encore des participants. Si il y a 0 participant alors on supprime la rencontre également.
+        nbParticipation = Participer.objects.filter(idRencontre=rencontre).count()
+        if nbParticipation==0:
+            rencontre.delete()
+
         return listRencontre(request)
 
     message = "votre participation"
@@ -657,7 +664,12 @@ def createStade(request):
 #READ
 def readStade(request,idStade):
     stade = get_object_or_404(Stade, idStade=idStade)
-    return render(request, "stade/read_stade.html", {"Stade":stade})
+
+    dataform={
+        "choix_stade":stade,
+    }
+    form=CreationRencontreForm(dataform)
+    return render(request, "stade/read_stade.html", {"Stade":stade,"CreationRencontreAvecStade":form})
 
 
 #LIST
@@ -681,7 +693,6 @@ def listStadeMonQuartier(request,page=1):
     return render(request, 'stade/list_stade.html', {'stades': stades,"ListQuartiers":quartier})
 
 #Liste tous les stades appartenant au quartier en paramètre
-@login_required
 def listStadeParQuartier(request,idQuartier,page=1):
     choixQuartier = get_object_or_404(Quartier, idQuartier=idQuartier)
     stades_list = Stade.objects.filter(quartierStade=choixQuartier)
