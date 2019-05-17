@@ -1,10 +1,11 @@
+//Variables globales
 var url;
 var data;
 var reponse;
 var method;
 
-//Fonction de traitement, après que la requête Ajax
-
+//--------Fonctions de traitement, après la requête Ajax
+//Le principe est le même à pour chacune des focntions, elles renvoient le feedback à l'utilisateur dans une balise div
 function demande_amis_traitement(reponse){
     var feeback_html = document.getElementById("feedback_demande_ami");
     feeback_html.innerHTML = reponse.feedback;
@@ -20,15 +21,15 @@ function recherche_amis_traitement(reponse){
 }
 
 function accepter_amis_traitement(reponse){
-    alert(reponse.feedback);
-    document.location.reload(true);
+    alert(reponse.feedback);                    //Affichage du feedback avec une fenêtre de dialogue
+    document.location.reload(true);             //Rechargement de la page
     var feeback_html = document.getElementById("feedback");
     feeback_html.innerHTML = reponse.feedback;
 }
 
 function supprimer_amis_traitement(reponse){
-    alert(reponse.feedback);
-    document.location.reload(true);
+    alert(reponse.feedback);                    //Affichage du feedback avec une fenêtre de dialogue
+    document.location.reload(true);             //Rechargement de la page
     var feeback_html = document.getElementById("feedback_mesamis");
     feeback_html.innerHTML = reponse.feedback;
 }
@@ -60,6 +61,13 @@ function requeteAjax(method,url,data,fonction_succes){
      };
 }
 
+
+//----Fonctions appelé après un click sur bouttons: onclick
+
+
+//---FONCTIONS POUR LE MODÈLE AMIS ---
+
+//Action : Fait appel à la view de creation du modèle Amis
 function demande_amis(){
     method = "POST";
     url = "/friend/sendto/";
@@ -70,6 +78,8 @@ function demande_amis(){
     requeteAjax(method,url,data,demande_amis_traitement);
 }
 
+//Action : Recherche un joueur à partir de son Username
+//POST-COND: Le username du joueur est inséré dans le input de demande d'ami.
 function recherche_amis(){
     method = "POST";
     url = "/friend/search/";
@@ -80,7 +90,8 @@ function recherche_amis(){
     requeteAjax(method,url,data,recherche_amis_traitement);
 }
 
-
+//Action : Accepte une demande reçue (on passe l'attribut etatJoueur2 à 'Accepter')
+//idUser: Le joueur avec qui l'on souhaite être ami
 function accepter_amis(idUser){
     method = "POST";
     url = "/friend/accept/";
@@ -90,7 +101,8 @@ function accepter_amis(idUser){
     requeteAjax(method,url,data,accepter_amis_traitement);
 }
 
-//A TESTER
+//Action : Supprime une amitié
+//idUser: Le joueur dont l'on souhaite ne plus être ami
 function supprimer_amis(idUser){
     method = "POST"
     url = "/friend/delete/";
@@ -100,8 +112,10 @@ function supprimer_amis(idUser){
     requeteAjax(method,url,data,supprimer_amis_traitement);
 }
 
-//-----INVITER
+//---FONCTIONS POUR LE MODÈLE INVITER ---
 
+//Action : Création d'une invitation à une rencontre
+//idUser: Le joueur que l'on invite
 function inviter_amis(idUser,idrencontre){
     method = "POST";
     url = "/game/invitation/new/";
@@ -113,6 +127,7 @@ function inviter_amis(idUser,idrencontre){
     requeteAjax(method,url,data,inviter_amis_traitement);
 }
 
+//Action : Pour accepter une invitation -> entraîne la création d'une participation
 function accepter_invit(idrencontre){
     method = "POST";
     url = "/game/invitation/accept/";
@@ -123,7 +138,8 @@ function accepter_invit(idrencontre){
     requeteAjax(method,url,data,reponse_invit_traitement);
 }
 
-//A TESTER
+//Action : Pour refuser une invitation émise
+//idJoueur : joueur demandeur
 function rejeter_invit(idJoueur,idrencontre){
     method = "POST"
     url = "/game/invitation/reject/";
@@ -135,7 +151,8 @@ function rejeter_invit(idJoueur,idrencontre){
     reponse = requeteAjax(method,url,data,reponse_invit_traitement);
 }
 
-//A TESTER
+//Action : Pour annuler une invitation émise
+//idJoueur : joueur invité
 function annuler_invit(idJoueur,idrencontre){
     method = "POST"
     url = "/game/invitation/cancel/";
