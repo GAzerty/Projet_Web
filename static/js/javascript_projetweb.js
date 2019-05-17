@@ -20,12 +20,14 @@ function recherche_amis_traitement(reponse){
 }
 
 function accepter_amis_traitement(reponse){
+    alert(reponse.feedback);
     document.location.reload(true);
     var feeback_html = document.getElementById("feedback");
     feeback_html.innerHTML = reponse.feedback;
 }
 
 function supprimer_amis_traitement(reponse){
+    alert(reponse.feedback);
     document.location.reload(true);
     var feeback_html = document.getElementById("feedback_mesamis");
     feeback_html.innerHTML = reponse.feedback;
@@ -58,7 +60,7 @@ function requeteAjax(method,url,data,fonction_succes){
      };
 }
 
-function demande_amis_click(){
+function demande_amis(){
     method = "POST";
     url = "/friend/sendto/";
     var inputs = document.getElementsByTagName("input");
@@ -68,7 +70,7 @@ function demande_amis_click(){
     requeteAjax(method,url,data,demande_amis_traitement);
 }
 
-function recherche_amis_click(){
+function recherche_amis(){
     method = "POST";
     url = "/friend/search/";
     var inputs = document.getElementsByTagName("input");
@@ -97,10 +99,6 @@ function supprimer_amis(idUser){
     data = csrf+"&"+"User="+idUser;
     requeteAjax(method,url,data,supprimer_amis_traitement);
 }
-
-document.getElementById("btn_demande_usernameAmis").onclick = demande_amis_click;
-document.getElementById("btn_rechercheUsername").onclick = recherche_amis_click;
-
 
 //-----INVITER
 
