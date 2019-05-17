@@ -3,7 +3,7 @@ from app.models import Joueur, Quartier, Amis, Rencontre, Stade, Inviter, Partic
 
 
 class JoueurAdmin(admin.ModelAdmin):
-    list_display = ('idJoueur','quartierJoueur',) #On renseigne les attributs affichés sur la page admin
+    list_display = ('idJoueur','quartierJoueur',) #On renseigne les attributs qui seront affichés sur la page admin
     search_fields = ('quartierJoueur',)  #Les attributs utilisés pour la recherche
 
 class QuartierAdmin(admin.ModelAdmin):
@@ -32,7 +32,7 @@ class ParticiperAdmin(admin.ModelAdmin):
 
 
 
-# Register your models here.
+#On enregistre chaque modèle avec la configuration que l'on a établie au-dessus.
 admin.site.register(Joueur,JoueurAdmin)
 admin.site.register(Quartier,QuartierAdmin)
 admin.site.register(Amis,AmisAdmin)
@@ -40,3 +40,5 @@ admin.site.register(Rencontre,RencontreAdmin)
 admin.site.register(Stade,StadeAdmin)
 admin.site.register(Inviter,InviterAdmin)
 admin.site.register(Participer,ParticiperAdmin)
+
+#L'administrateur du site peut maintenant réaliser toutes les actions de bases (CRUD) sur les modèles.
