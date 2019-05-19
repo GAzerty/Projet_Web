@@ -3,3 +3,5 @@ gunicorn
 django-heroku
 pillow
 django-widget-tweaks
+django-storages
+dropbox
