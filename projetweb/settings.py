@@ -17,7 +17,6 @@ import django_heroku
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = os.environ.get('SECRET_KEY',True)
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
@@ -40,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'app',
     'widget_tweaks',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -140,13 +140,17 @@ STATICFILES_DIRS = (
 )
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage' #Moteur de stockage pour collectstatic, utilisation de whitenoise
 
-MEDIA_URL = '/media/'                           #Url cible pour les fichiers uploadé
+#En développement on gère les fichiers media comme ceci:
+"""MEDIA_URL = '/media/'                           #Url cible pour les fichiers uploadé
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')   #Répertoire cible pour les fichiers uploadé
-
+"""
 
 LOGIN_URL = 'signin' #Redirection vers la connexion de l'utilisateur
 LOGIN_REDIRECT_URL = 'account' #Redirection après la connexion de l'utilisateur
 
+DEFAULT_FILE_STORAGE = 'storages.backends.dropbox.DropBoxStorage'
+DROPBOX_OAUTH2_TOKEN = os.environ.get('TOKEN_DROPB',True)
+DROPBOX_ROOT_PATH = '/ProjetWebApp'
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())
