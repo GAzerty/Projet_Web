@@ -263,7 +263,7 @@ def accepteAmis(request):
 
 #---DELETE
 #Réalisé via AJAX
-#Refuser une demande & Annuler une demande
+#Refuser une demande & Supprimer une demande
 #Supprime la liaison entre deux joueur.
 #Entre le joueur connecté et le joueur dont l'id est passé via une requête AJAX
 @login_required
@@ -277,9 +277,15 @@ def supprimerAmis(request):
         joueur1 = Joueur.objects.get(idJoueur=utilisateur[0])
         joueur2 = getJoueurConnecte(request)
 
-        ListAmis = mesAmis(joueur2) #On récupère tous les amis du joueur connecté
+        ListAmis = mesAmis(joueur2) #On récupère tous les amis (réciproque) du joueur connecté
         relation_amis = False
         for ami in ListAmis: #Parcour de la liste pour rechercher le joueur en paramètre et vérifier que l'amitié existe bien
+            if (joueur1.idJoueur == ami.joueur1Amis.idJoueur) or (joueur1.idJoueur == ami.joueur2Amis.idJoueur):
+                relation_amis=True
+                amitie=ami
+
+        ListAmisDemande = mesDemandes(joueur2) #On récupère les demandes en amis (en cas de refus d'une amitié)
+        for ami in ListAmisDemande: #Parcour de la liste pour rechercher le joueur en paramètre et vérifier que l'amitié existe bien
             if (joueur1.idJoueur == ami.joueur1Amis.idJoueur) or (joueur1.idJoueur == ami.joueur2Amis.idJoueur):
                 relation_amis=True
                 amitie=ami
